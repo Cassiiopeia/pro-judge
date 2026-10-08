@@ -91,3 +91,10 @@ def test_contest_type_check_catches_drift(tmp_path):
     (tmp_path / "shared/references/contest-types/sports.md").write_text("# sports\n", encoding="utf-8")
     profiles, schema, validator = contest_type_sources(tmp_path)
     assert profiles != schema
+
+
+def test_every_script_skill_gets_shared_copy():
+    # SKILL.md가 $SKILL/shared/를 쓰는데 동기화 대상에서 빠지면 설치본에 스크립트가 없다
+    using = {p.parent.name for p in (ROOT / "skills").glob("*/SKILL.md") if "$SKILL/shared/" in p.read_text(encoding="utf-8")}
+    assert using <= set(sync_shared.TARGET_SKILLS), using - set(sync_shared.TARGET_SKILLS)
+    assert "pro-judge-gather" in using

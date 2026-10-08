@@ -16,6 +16,7 @@ from statistics import mean, median
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate_rubric import validate_rubric  # noqa: E402
+import evidence  # noqa: E402
 from _common import InputError, list_runs, load_json, load_yaml, parse_run_name, run_cli, write_json  # noqa: E402
 
 # 확인 불가(claim-not-verified)가 시연 실패(claim-failed)보다 높으면 데모를 숨기는 편이 유리해진다 — 같은 값으로 둔다
@@ -364,6 +365,9 @@ def main(argv=None) -> int:
     rubric_errors = validate_rubric(rubric)
     if rubric_errors:
         raise InputError("rubric.yaml 결함 — validate_rubric.py로 고친 뒤 다시 실행:\n- " + "\n- ".join(rubric_errors))
+    # 근거 장부가 깨져 있으면 채점 결과를 만들기 전에 멈춘다 — 무엇을 봤는지 틀린 채로 보고서가 나가면 안 된다
+    ledger_path = run_dir / "evidence.yaml"
+    ledger = evidence.load_checked(ledger_path, rubric) if ledger_path.is_file() else None
     files = [f for f in sorted(run_dir.glob("*.json")) if f.name not in SKIP_FILES]
     if not files:
         raise InputError(f"{run_dir}에 페르소나 결과 json이 없음")
@@ -381,6 +385,7 @@ def main(argv=None) -> int:
                            source_text=_read_target(run_dir), calibration=args.calibration)
     except AggregateError as e:
         raise InputError(str(e))
+    result["evidence"] = evidence.summary(ledger, rubric) if ledger else None
     write_json(run_dir / "result.json", result)
     if not result["quotes_verified"]:
         print("경고: target/ 폴더가 없어 인용 원문 대조를 하지 않음")

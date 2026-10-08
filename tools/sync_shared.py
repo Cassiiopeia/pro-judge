@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TARGET_SKILLS = ("pro-judge-setup", "pro-judge-ideas", "pro-judge-score", "pro-judge-grill")
+TARGET_SKILLS = ("pro-judge-setup", "pro-judge-ideas", "pro-judge-score", "pro-judge-grill", "pro-judge-gather")
 IGNORE_DIRS = {"__pycache__", ".pytest_cache"}
 
 
