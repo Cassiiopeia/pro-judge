@@ -87,7 +87,78 @@ def _score_blocks(r: dict) -> list:
     return b
 
 
-BUILDERS = {"score": _score_blocks}
+VERDICT_LABEL = {"up": "올림", "same": "그대로", "down": "깎음", None: "-"}
+VERDICT_ORDER = {"down": 0, "same": 1}
+COST_LABEL = {"low": "낮음", "mid": "중간", "high": "높음"}
+
+
+def validate_grill(r: dict) -> None:
+    if r.get("mode") not in ("practice", "sheet"):
+        raise InputError("grill result: mode는 practice/sheet")
+    for n, q in enumerate(r.get("questions") or []):
+        for qq in [q, *(q.get("follow_ups") or [])]:
+            if qq.get("verdict") not in VERDICT_LABEL:
+                raise InputError(f"grill result questions[{n}]: verdict는 up/same/down/null")
+            if not str(qq.get("question") or "").strip():
+                raise InputError(f"grill result questions[{n}]: question이 비어 있음")
+
+
+def _grill_blocks(r: dict) -> list:
+    validate_grill(r)
+    mode = "연습" if r["mode"] == "practice" else "질문지"
+    b = [{"type": "h1", "text": f"{r['contest']} 질의응답 보고서"},
+         {"type": "p", "text": f"{r['created_at']} · {mode} 모드 · 질문 {len(r['questions'])}개"}]
+    rows, weak = [], []
+    for n, q in enumerate(r["questions"], 1):
+        rows.append([n, q["persona"], q["item"], q["question"], q.get("answer") or "-",
+                     VERDICT_LABEL[q.get("verdict")], q.get("reason") or "-"])
+        if q.get("verdict") in VERDICT_ORDER:
+            weak.append((VERDICT_ORDER[q["verdict"]], n, q))
+        for m, f in enumerate(q.get("follow_ups") or [], 1):
+            rows.append([f"{n}-꼬리{m}", q["persona"], q["item"], f["question"], f.get("answer") or "-",
+                         VERDICT_LABEL[f.get("verdict")], f.get("reason") or "-"])
+            if f.get("verdict") in VERDICT_ORDER:
+                weak.append((VERDICT_ORDER[f["verdict"]], n, f))
+    if r["mode"] == "practice":
+        b += [{"type": "h2", "text": "질문과 판정"},
+              {"type": "table", "headers": ["#", "심사위원", "항목", "질문", "답", "판정", "이유"], "rows": rows},
+              {"type": "h2", "text": "약한 답변"},
+              {"type": "list", "items": [f"[{VERDICT_LABEL[q['verdict']]}] {q['question']} — {q.get('reason') or '-'}"
+                                         for _, _, q in sorted(weak, key=lambda t: (t[0], t[1]))]}]
+    else:
+        b += [{"type": "h2", "text": "예상 질문지"},
+              {"type": "table", "headers": ["#", "심사위원", "항목", "질문", "모범 답변 뼈대"],
+               "rows": [[n, q["persona"], q["item"], q["question"], q.get("model_answer") or "-"]
+                        for n, q in enumerate(r["questions"], 1)]}]
+    b += [{"type": "h2", "text": "자료 수정 제안"},
+          {"type": "table", "headers": ["넣을 근거", "항목", "점수 변화"],
+           "rows": [[s["evidence"], s["item"], f"{s['from_score']} → {s['to_score']}"] for s in r.get("suggestions") or []]},
+          {"type": "h2", "text": "총평"},
+          {"type": "p", "text": (r.get("narrative") or {}).get("overall") or "(총평 없음)"}]
+    return b
+
+
+def _ideas_blocks(r: dict) -> list:
+    b = [{"type": "h1", "text": f"{r['contest']} 아이디어 비교"},
+         {"type": "p", "text": f"{r['created_at']} · 명세대로 완벽히 구현했다고 가정한 상한 점수"},
+         {"type": "table", "headers": ["순위", "아이디어", "상한 점수", "취지", "막는 요인", "구현 비용"],
+          "rows": [[i["rank"], i["title"],
+                    f"{i['total']:.1f}" + (f" ({i['total_range'][0]:.1f}~{i['total_range'][1]:.1f})" if i["total_range"] else ""),
+                    ("취지 경보 " if i["gate"]["warning"] else "") + f"{i['gate']['score']:g}/10",
+                    " / ".join(i["blockers"]) or "-",
+                    f"{COST_LABEL.get(i['cost']['level'], i['cost']['level'])} — {i['cost']['note'] or '-'}"]
+                   for i in r["ideas"]]},
+         {"type": "bars", "rows": [{"label": i["title"], "value": i["total"], "max": 100} for i in r["ideas"]]}]
+    for i in r["ideas"]:
+        b += [{"type": "h2", "text": f"{i['title']} — 점수를 막는 것"},
+              {"type": "list", "items": [f"{f['name']}: +{f['gain']:g}점 여지 — {' / '.join(f['unlock_hints']) or '해제 조건 없음'}"
+                                         for f in i["fix_priority"]]}]
+    b += [{"type": "h2", "text": "총평"},
+          {"type": "p", "text": (r.get("narrative") or {}).get("overall") or "(총평 없음)"}]
+    return b
+
+
+BUILDERS = {"score": _score_blocks, "grill": _grill_blocks, "ideas": _ideas_blocks}
 
 
 def build_blocks(result: dict) -> list:
