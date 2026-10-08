@@ -1,14 +1,40 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T03:07:22Z",
-    "currentVersion": "0.2.0",
+    "lastUpdated": "2026-10-08T03:11:07Z",
+    "currentVersion": "0.2.1",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 2
+    "totalReleases": 3
   },
   "releases": [
+    {
+      "version": "0.2.1",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 15,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **문서**\n  * 기여 방법과 AI로 만든 PR 정책을 안내합니다\n  * 대회 종류를 추가하는 절차를 정리했습니다\n\n* **기타**\n  * 대회 종류 목록이 문서와 검사기에서 어긋나지 않게 했습니다",
+      "parsed_changes": {
+        "문서": {
+          "title": "문서",
+          "items": [
+            "기여 방법과 AI로 만든 PR 정책을 안내합니다",
+            "대회 종류를 추가하는 절차를 정리했습니다"
+          ]
+        },
+        "기타": {
+          "title": "기타",
+          "items": [
+            "대회 종류 목록이 문서와 검사기에서 어긋나지 않게 했습니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.2.0",
       "project_type": "basic",
