@@ -116,14 +116,49 @@ class PypdfBackend:
         return False  # pypdf는 쪽을 그림으로 그리지 못한다
 
 
+class FallbackPdf:
+    """쪽 하나가 깨져 첫 도구가 예외를 내면 그 쪽만 두 번째 도구로 읽는다 (실측: 색 공간이 깨진 쪽에서 PyMuPDF SystemError)."""
+
+    def __init__(self, primary, secondary):
+        self.primary, self.secondary = primary, secondary
+        self.name = f"{primary.name}+{secondary.name}"
+
+    def _try(self, method, *args):
+        try:
+            return getattr(self.primary, method)(*args)
+        except Exception:
+            return getattr(self.secondary, method)(*args)
+
+    def page_count(self, path):
+        return self._try("page_count", path)
+
+    def page_text(self, path, n):
+        return self._try("page_text", path, n)
+
+    def render(self, path, n, out):
+        return self._try("render", path, n, out)
+
+
+def _quiet_mupdf(mod):
+    # 깨진 쪽마다 MuPDF가 stderr에 수십 줄을 쏟는다 — 실패는 쪽 표시로 알리므로 끈다
+    for fn in ("mupdf_display_errors", "mupdf_display_warnings"):
+        try:
+            getattr(mod.TOOLS, fn)(False)
+        except Exception:
+            pass
+
+
 def pick_pdf_backend():
+    poppler = PopplerBackend() if shutil.which("pdftotext") and shutil.which("pdfinfo") else None
     for modname in ("pymupdf", "fitz"):
         try:
-            return PyMuPDFBackend(__import__(modname))
+            mod = __import__(modname)
         except ImportError:
             continue
-    if shutil.which("pdftotext") and shutil.which("pdfinfo"):
-        return PopplerBackend()
+        _quiet_mupdf(mod)
+        return FallbackPdf(PyMuPDFBackend(mod), poppler) if poppler else PyMuPDFBackend(mod)
+    if poppler:
+        return poppler
     try:
         return PypdfBackend(__import__("pypdf"))
     except ImportError:
@@ -245,17 +280,24 @@ def extract_pdf(path: Path, pages_spec, backend, ocr, img_dir: Path):
     """쪽마다 글자를 뽑고, 글자가 거의 없는 쪽은 OCR한다. OCR이 안 되면 쪽 이미지를 남긴다."""
     stem = path.stem
     pages = parse_pages(pages_spec, backend.page_count(path))
-    stats = {"pages": len(pages), "text": 0, "ocr": 0, "image": []}
+    stats = {"pages": len(pages), "text": 0, "ocr": 0, "image": [], "visual": []}
     chunks, pending = {}, []
     for n in pages:
-        text = backend.page_text(path, n)
+        try:
+            text = backend.page_text(path, n)
+        except Exception:
+            text = ""  # 깨진 쪽 하나 때문에 나머지 쪽을 버리지 않는다
         if not needs_ocr(text):
             chunks[n] = ("text", text)
             stats["text"] += 1
             continue
         img_dir.mkdir(parents=True, exist_ok=True)
         png = img_dir / f"{stem}-p{n:03d}.png"
-        if backend.render(path, n, png):
+        try:
+            rendered = backend.render(path, n, png)
+        except Exception:
+            rendered = False
+        if rendered:
             pending.append((n, png))
         else:
             chunks[n] = ("unreadable", text)
@@ -264,9 +306,10 @@ def extract_pdf(path: Path, pages_spec, backend, ocr, img_dir: Path):
         got = results.get(png, "")
         # 슬라이드 글자는 짧다 — OCR 결과는 몇 글자라도 있으면 받는다
         if re.sub(r"\s", "", got):
-            chunks[n] = ("ocr", got)
+            # 글은 OCR로 얻었어도 앱 화면·도표·색 대비는 그림으로만 판단된다 — 이미지를 지우지 않는다
+            chunks[n] = (f"ocr, image: {png}", got)
             stats["ocr"] += 1
-            png.unlink()
+            stats["visual"].append(png)
         else:
             chunks[n] = (f"image: {png}", got)  # 에이전트가 이 이미지를 직접 읽는다
             stats["image"].append(png)
@@ -327,7 +370,7 @@ def main(argv=None) -> int:
     target.mkdir(parents=True, exist_ok=True)
 
     backend = ocr = None
-    images = []
+    images, visuals = [], []
     for f in files:
         suffix = f.suffix.lower()
         if suffix == ".pdf":
@@ -336,7 +379,9 @@ def main(argv=None) -> int:
                 ocr = pick_ocr(args.ocr)
             text, st = extract_pdf(f, args.pages, backend, ocr, img_dir)
             images += st["image"]
-            how = f"PDF {st['pages']}쪽: 글자 {st['text']} · OCR {st['ocr']}({getattr(ocr, 'name', '없음')}) · 이미지 {len(st['image'])}"
+            visuals += st["visual"]
+            how = (f"PDF {st['pages']}쪽: 글자 {st['text']} · OCR {st['ocr']}({getattr(ocr, 'name', '없음')}) · "
+                   f"그림 보관 {len(st['visual'])} · 읽지 못한 이미지 {len(st['image'])}")
         elif suffix == ".pptx":
             text, how = extract_pptx(f), "PPTX 슬라이드 글자 (슬라이드 속 그림 글자는 PDF로 내보내 OCR)"
         elif suffix == ".docx":
@@ -346,6 +391,9 @@ def main(argv=None) -> int:
         out = _unique(target, f.stem)
         out.write_text(text, encoding="utf-8")
         print(f"{out}  ← {f.name} ({how})")
+    if visuals:
+        print(f"그림 확인용 이미지 {len(visuals)}개: {img_dir} — 글은 OCR로 target/에 들어갔다. "
+              f"앱 화면·도표·색 대비를 판단해야 하는 항목은 이 이미지를 직접 본다")
     if images:
         print(f"이미지로 읽을 쪽 {len(images)}개 (OCR 도구 없음 또는 인식 실패) — 에이전트가 직접 열어 읽고 "
               f"읽은 글을 target/에 덧붙인다:")

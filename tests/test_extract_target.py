@@ -47,16 +47,18 @@ def test_text_pages_skip_ocr(tmp_path):
     pdf = FakePdf(["첫 쪽 본문이 충분히 길게 들어 있다 스무 글자를 넘긴다", "둘째 쪽 본문도 충분히 길게 들어 있다 스무 글자를 넘긴다"])
     text, stats = et.extract_pdf(tmp_path / "a.pdf", None, pdf, None, tmp_path / "img")
     assert "첫 쪽 본문" in text and "--- a p2 [text] ---" in text
-    assert stats == {"pages": 2, "text": 2, "ocr": 0, "image": []}
+    assert stats == {"pages": 2, "text": 2, "ocr": 0, "image": [], "visual": []}
 
 
 def test_image_page_goes_to_ocr(tmp_path):
     # 슬라이드가 이미지인 쪽은 pdftotext가 쪽 번호 정도만 낸다 — OCR로 채운다
     pdf = FakePdf(["본문이 충분히 길게 들어 있는 쪽이다 열두자 이상으로 더 길게 쓴 본문", "27"])
     text, stats = et.extract_pdf(tmp_path / "deck.pdf", None, pdf, fake_ocr({"2": "모두의운동장 시연 화면"}), tmp_path / "img")
-    assert "--- deck p2 [ocr] ---\n모두의운동장 시연 화면" in text
+    png = tmp_path / "img" / "deck-p002.png"
+    assert f"--- deck p2 [ocr, image: {png}] ---\n모두의운동장 시연 화면" in text
     assert stats["ocr"] == 1 and stats["image"] == []
-    assert not list((tmp_path / "img").glob("*.png"))  # OCR로 읽은 쪽 이미지는 남기지 않는다
+    # 앱 화면·도표·색 대비는 글자로 안 남는다 — 그림 확인용으로 이미지를 보관한다
+    assert stats["visual"] == [png] and png.is_file()
 
 
 def test_no_ocr_keeps_image_for_agent(tmp_path):
@@ -141,3 +143,30 @@ def test_windows_ocr_command_is_built_in_powershell(tmp_path):
 
 def test_pick_ocr_none_when_disabled():
     assert et.pick_ocr("none") is None
+
+
+class BrokenPage(FakePdf):
+    """특정 쪽에서 백엔드가 예외를 던진다 (실측: 색 공간이 깨진 PDF 쪽에서 PyMuPDF SystemError)."""
+    def page_text(self, path, n):
+        if n == 2:
+            raise SystemError("unknown colorspace")
+        return super().page_text(path, n)
+
+    def render(self, path, n, out):
+        if n == 2:
+            raise SystemError("unknown colorspace")
+        return super().render(path, n, out)
+
+
+def test_broken_page_does_not_stop_extraction(tmp_path):
+    long = "본문이 충분히 길게 들어 있는 쪽이다 스무 글자를 넘긴다"
+    pdf = BrokenPage([long, "", long])
+    text, stats = et.extract_pdf(tmp_path / "d.pdf", None, pdf, None, tmp_path / "img")
+    assert "--- d p2 [unreadable] ---" in text and "--- d p3 [text] ---" in text
+
+
+def test_broken_page_falls_back_to_second_backend(tmp_path):
+    long = "본문이 충분히 길게 들어 있는 쪽이다 스무 글자를 넘긴다"
+    backend = et.FallbackPdf(BrokenPage([long, "", long]), FakePdf([long, "둘째 쪽은 다른 도구로 읽힌다 스무 글자를 넘긴다", long]))
+    text, _ = et.extract_pdf(tmp_path / "d.pdf", None, backend, None, tmp_path / "img")
+    assert "--- d p2 [text] ---\n둘째 쪽은 다른 도구로" in text
