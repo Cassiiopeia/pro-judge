@@ -59,7 +59,7 @@ Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiop
 
 ## 기여
 
-[CONTRIBUTING.md](CONTRIBUTING.md) · 보안 문제는 [비공개 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new) · 라이선스 [Apache-2.0](LICENSE)
+[CONTRIBUTING.md](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · 질문은 [Discussions](https://github.com/Cassiiopeia/pro-judge/discussions) · 보안 문제는 [비공개 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new) · 라이선스 [Apache-2.0](LICENSE)
 
 ---
 

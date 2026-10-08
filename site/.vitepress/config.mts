@@ -27,7 +27,16 @@ export default withMermaid(defineConfig({
   lastUpdated: false,
   // 저장소 파일(../README.md 등)을 가리키는 링크는 사이트 안에 없다
   ignoreDeadLinks: true,
-  head: [['meta', { name: 'theme-color', content: '#b4232a' }]],
+  // 링크를 메신저·SNS에 붙였을 때 미리보기가 보이게 한다
+  head: [
+    ['meta', { name: 'theme-color', content: '#b4232a' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'pro-judge — 내기 전에, 그 대회 심사위원에게 먼저' }],
+    ['meta', { property: 'og:description', content: '공고와 심사기준으로 심사위원을 만들어 내 자료를 채점하고, 어디를 고치면 몇 점이 오르는지 알려 주는 Agent Skills' }],
+    ['meta', { property: 'og:image', content: 'https://cassiiopeia.github.io/pro-judge/assets/report-desktop.png' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+  ],
+  sitemap: { hostname: 'https://cassiiopeia.github.io/pro-judge/' },
   themeConfig: {
     nav: [
       { text: '시작하기', link: '/guide/getting-started' },
