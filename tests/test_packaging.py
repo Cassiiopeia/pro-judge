@@ -38,6 +38,16 @@ def test_plugin_manifests():
     assert "SessionStart" in hooks["hooks"]
 
 
+def test_plugin_version_not_pinned():
+    # 버전의 기준은 version.yml 하나다. plugin.json에 version이 남으면 릴리스 때 올라가지 않아
+    # Claude Code가 같은 버전으로 보고 새 커밋을 업데이트로 받지 않는다 — 비워 두면 커밋 SHA로 판단한다
+    plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
+    market = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text())
+    assert "version" not in plugin
+    assert "version" not in market["plugins"][0]
+    assert (ROOT / "version.yml").is_file()
+
+
 def run_hook(project_dir):
     env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT), "CLAUDE_PROJECT_DIR": str(project_dir)}
     return subprocess.run(["bash", str(ROOT / "hooks" / "session-start.sh")],

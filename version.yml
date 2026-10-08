@@ -1,0 +1,73 @@
+# ===================================================================
+# Project version management file
+# ===================================================================
+#
+# This file keeps version information in one place for every project type.
+# GitHub Actions workflows read this file and manage the version automatically.
+#
+# Usage:
+# 1. version: "1.0.0" - the version shown to users
+# 2. version_code: 1 - Play Store/App Store build number (auto-incremented from 1)
+# 3. project_types: array of project types, the first entry is the primary one
+# 4. project_paths: project folder per type (relative to the repo root, for monorepos)
+#
+# Automatic version updates:
+# - version_code: incremented by 1 on every build (independent of the rules below)
+# - How far the version is bumped is decided by metadata.template.options.semver_auto
+#   semver_auto: true  -> decided by the commit titles in the release range
+#                         "title : feat! : body" or "feat!:" -> major (x+1.0.0)
+#                         "title : feat : body"  or "feat:"  -> minor (x.y+1.0)
+#                         anything else (fix/docs/chore/refactor/test) -> patch (x.y.z+1)
+#   key missing / false -> always patch +1
+# - You may edit the version value by hand regardless of the rules above
+#
+# Files synced per project type:
+# - spring: build.gradle (version = "x.y.z")
+# - flutter: pubspec.yaml (version: x.y.z+i, includes buildNumber)
+# - react/node: package.json ("version": "x.y.z")
+# - react-native: iOS Info.plist or Android build.gradle
+# - react-native-expo: app.json (expo.version)
+# - python: pyproject.toml (version = "x.y.z")
+# - basic/other: only this version.yml file is used
+#
+# Related workflows:
+# - .github/workflows/PROJECT-VERSION-CONTROL.yaml
+# - .github/workflows/PROJECT-README-VERSION-UPDATE.yaml
+# - .github/workflows/PROJECT-RELEASE-CHANGELOG.yaml
+#
+# Notes:
+# - Do not change project_types after the initial setup
+# - The version is always synced automatically to the highest one
+# ===================================================================
+
+version: "0.1.0"
+version_code: 1  # app build number
+project_types: ["basic"]   # array of types, first entry is primary, safe to edit by hand
+metadata:
+  last_updated: "2026-10-08 02:30:28"
+  last_updated_by: "template_integrator"
+  default_branch: "main"
+  integrated_from: "projectops"
+  integration_date: "2026-10-08"
+  template:
+    source: "projectops"
+    version: "4.36.4"
+    mode: "full"   # install scope (full/version/workflows), used when re-running update mode
+    integrated_date: "2026-10-08"
+    last_update_date: "2026-10-08"
+    options:
+      intent: "none"   # project kind (app/library/both/none/manual), drives the deploy questions
+      deploy: "none"
+      publish: []
+      secret_backup: false
+      semver_auto: true   # decide the version bump from commit titles (false means always patch)
+      projects_sync: false   # GitHub Projects 상태 동기화 워크플로우 포함 여부
+      close_on_release: true   # close issues labelled done when a release is merged (false or missing means do not close)
+      language: ko   # issue/PR template language (en | ko)
+      label_style: ko   # status label style (en: status: todo / ko: Korean names)
+      code_review:
+        coderabbit: false
+        ai_summary: true
+      changelog:
+        provider: "commit"
+        base_url: ""
