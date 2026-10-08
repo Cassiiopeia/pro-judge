@@ -31,9 +31,23 @@ description: 자료 채점. 발표자료·기획서·레포·배포 URL을 등�
 python3 $SKILL/shared/scripts/contest_dirs.py new-run <대회 폴더> score
 ```
 
-이어서 **채점 대상 원문을 `<런 폴더>/target/`에 텍스트로 저장한다** (PPT·PDF는 추출한 텍스트, 레포는 README와 읽은 코드 발췌,
-배포 URL은 화면에서 읽은 글과 누른 결과 기록). 합산이 인용을 이 원문과 대조한다. 원문에 없는 인용은 지워지고,
+이어서 **채점 대상 원문을 `<런 폴더>/target/`에 텍스트로 저장한다.** 합산이 인용을 이 원문과 대조한다. 원문에 없는 인용은 지워지고,
 폴더가 없으면 보고서에 "인용 원문 대조 안 함"이 찍힌다. 페르소나 프롬프트의 `<target>`에도 이 파일들을 준다.
+
+파일(PDF·PPTX·DOCX·md)은 추출 도구로 넣는다:
+
+```bash
+python3 $SKILL/shared/scripts/extract_target.py <런 폴더> <파일...> [--pages 27-47]
+```
+
+- 슬라이드가 이미지인 PDF 쪽은 OCR한다 (macOS Vision, Windows 내장 OCR, tesseract 중 있는 것).
+- `PDF를 읽을 도구가 없습니다`가 나오면 안내된 `pip install` 명령을 사용자에게 알리고 멈춘다.
+- `이미지로 읽을 쪽` 목록이 나오면 그 PNG를 직접 열어 읽고, 읽은 글을 `<런 폴더>/target/<이름>-images.txt`에
+  `--- <파일> p<쪽> ---` 머리를 달아 덧붙인다. 빈 간지·표지는 건너뛴다.
+- PPTX는 슬라이드의 글 상자만 읽힌다. 슬라이드 속 그림 글자까지 필요하면 PDF로 내보내 다시 넣는다.
+- hwp·ppt·doc은 PDF로 저장해 달라고 한다.
+
+레포는 README와 읽은 코드 발췌를, 배포 URL은 화면에서 읽은 글과 누른 결과 기록을 `target/`에 직접 쓴다.
 
 ## 4. 페르소나별 독립 실행
 

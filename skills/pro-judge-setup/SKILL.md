@@ -18,6 +18,8 @@ PyYAML이 없다는 오류가 나면 `python3 -m pip install pyyaml`을 안내�
 ## 1. 입력 받기
 
 URL·이미지·PDF·붙여넣은 글을 받는다. 여러 개를 받을 수 있다.
+PDF·PPTX·DOCX 공고는 `python3 $SKILL/shared/scripts/extract_target.py <대회 폴더>/source <파일>`로 글을 뽑아 읽는다
+(이미지 쪽은 OCR, 안 되면 남은 PNG를 직접 연다). 역대 수상작 자료집도 같은 도구로 쪽 범위(`--pages`)를 나눠 뽑는다.
 URL이 JS 렌더링 등으로 읽히지 않으면 읽은 것과 못 읽은 것을 나눠 말하고 캡처나 글을 요청한다.
 짐작으로 빈칸을 채우지 않는다.
 

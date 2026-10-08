@@ -29,7 +29,11 @@ pro-judge는 판단은 에이전트에게, 숫자는 스크립트에게 맡긴�
 
 ```bash
 python3 -m pip install pyyaml
+python3 -m pip install pymupdf   # 선택: PDF 발표자료를 채점할 때 (Windows·macOS·Linux 공통)
 ```
+
+슬라이드가 이미지인 PDF는 쪽마다 OCR한다. macOS는 Vision, Windows는 내장 OCR을 쓰므로 따로 설치할 것이 없다.
+OCR을 쓸 수 없는 환경에서는 그 쪽을 이미지로 저장해 에이전트가 직접 읽는다.
 
 설치 방법은 두 가지다. **하나만 고른다.** 둘 다 설치하면 같은 skill이 두 번 잡힌다.
 
