@@ -1,14 +1,33 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T04:44:04Z",
-    "currentVersion": "0.3.0",
+    "lastUpdated": "2026-10-08T04:47:30Z",
+    "currentVersion": "0.3.1",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 6
+    "totalReleases": 7
   },
   "releases": [
+    {
+      "version": "0.3.1",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 26,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **버그 수정**\n  * fork 저장소에서 다른 브랜치에 있는 팀 작업을 놓치던 문제 해결",
+      "parsed_changes": {
+        "버그_수정": {
+          "title": "버그 수정",
+          "items": [
+            "fork 저장소에서 다른 브랜치에 있는 팀 작업을 놓치던 문제 해결"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.3.0",
       "project_type": "basic",
