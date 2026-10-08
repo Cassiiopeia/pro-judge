@@ -41,3 +41,16 @@ pre, code {
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
+
+/* 좁은 화면에서는 히어로 그림이 제목과 겹친다 — 같은 화면이 아래 영상에 있으니 숨긴다 */
+@media (max-width: 959px) {
+  .VPHero .image {
+    display: none;
+  }
+}
+
+/* 문서 안 영상도 캡처 이미지와 같은 카드 모양 */
+.vp-doc video {
+  display: block;
+  margin: 16px 0;
+}

@@ -1,0 +1,156 @@
+"""보고서 화면 설계 — 첫 화면에서 총점과 할 일이 먼저 보이고, 위험한 항목이 색으로 드러나는지."""
+import re
+from datetime import datetime
+
+import pytest
+
+from _common import load_yaml, write_json
+from aggregate import aggregate
+from contest_dirs import new_run
+import render_dashboard
+import render_report
+from render_report import contest_labels, render
+from report_blocks import to_html, to_markdown
+from factories import base_results
+from test_render_grill_ideas import GRILL
+
+
+@pytest.fixture
+def result(contest_dir):
+    r = aggregate(load_yaml(contest_dir / "rubric.yaml"), base_results(),
+                  created_at="2026-10-08T14:05", target="발표자료 v1", run="20261008-1405_score")
+    r["narrative"]["overall"] = "실현 가능성이 가장 약하다."
+    return r
+
+
+def test_total_comes_before_notices(result):
+    # 경고 상자가 총점을 밀어내던 문제 — 총점 카드가 먼저, 경고는 그 아래 한 덩어리
+    _, html = render(result)
+    assert html.index('class="hero') < html.index('class="notice')
+    assert '<span class="hero-score">62.0</span>' in html
+
+
+def test_notices_fold_into_one_details(result):
+    _, html = render(result)
+    assert html.count('class="notice') == 1
+    notice = re.search(r'<details class="notice">(.*?)</details>', html, re.S).group(1)
+    assert "보정 안 됨" in notice and "진단 지표" in notice
+    md, _ = render(result)
+    assert "보정 안 됨" in md  # md에서는 그대로 남는다
+
+
+def test_hero_shows_top_fix(result):
+    _, html = render(result)
+    hero = re.search(r'<section class="hero[^"]*">(.*?)</section>', html, re.S).group(1)
+    top = result["fix_priority"][0]
+    assert top["name"] in hero and f"+{top['gain']:g}" in hero
+
+
+def test_bars_scale_with_points_and_color_by_ratio():
+    html = to_html([{"type": "bars", "rows": [{"label": "큰 항목", "value": 2, "max": 20},
+                                              {"label": "작은 항목", "value": 4.5, "max": 5}],
+                     "scale": True}], "T")
+    # 트랙 길이가 배점에 비례한다 — 5점 항목이 20점 항목과 같은 길이로 보이지 않게
+    assert re.search(r'class="track" style="width:100\.0%"', html)
+    assert re.search(r'class="track" style="width:25\.0%"', html)
+    assert 'class="fill lv-low"' in html and 'class="fill lv-high"' in html
+
+
+def test_fix_cards(result):
+    _, html = render(result)
+    assert html.count('class="fix"') == len(result["fix_priority"])
+    md, _ = render(result)
+    assert "## 고칠 것 Top 5" in md
+
+
+def test_persona_titles_replace_ids(result, contest_dir):
+    labels = contest_labels(contest_dir / "runs" / "x")
+    assert labels["personas"]["developer"] == "개발자 심사위원"
+    assert labels["items"]["feasibility"] == "실현 가능성"
+    md, html = render(result, labels)
+    assert "개발자 심사위원" in md and "개발자 심사위원" in html
+
+
+def test_grill_uses_labels_and_cards(contest_dir):
+    labels = contest_labels(contest_dir / "runs" / "x")
+    md, html = render(GRILL, labels)
+    assert "개발자 심사위원" in html and "실현 가능성" in html
+    assert 'class="qa' in html
+    assert "## 질문과 판정" in md
+
+
+def test_brand_print_and_still_self_contained(result):
+    _, html = render(result)
+    assert "PRO-Judge" in html and "@media print" in html
+    assert "<script" not in html and not re.search(r'(src|href)="https?://', html)
+
+
+def test_markdown_handles_new_blocks():
+    md = to_markdown([{"type": "hero", "score": 31.7, "max": 100, "caption": "c", "sub": ["a"], "top_fix": None},
+                      {"type": "notice", "label": "읽는 법", "items": [{"label": "L", "text": "T"}]},
+                      {"type": "fixes", "items": []}])
+    assert "**31.7** / 100" in md and "**L** T" in md and "(없음)" in md
+
+
+def test_dashboard_trend(contest_dir):
+    for day, gate in ((8, 5), (9, 8)):
+        run = new_run(contest_dir, "score", datetime(2026, 10, day, 9, 0))
+        write_json(run / "result.json", aggregate(load_yaml(contest_dir / "rubric.yaml"),
+                                                  base_results(gate=gate), run=run.name))
+    _, html = render_dashboard.build(contest_dir)
+    hero = re.search(r'<section class="hero[^"]*">(.*?)</section>', html, re.S).group(1)
+    assert "62.0" in hero and "+9.3" in hero
+    assert "PRO-Judge" in html
+
+
+def test_overall_right_after_total_and_appendix_folded(result):
+    # 총평은 한 문단 요약이라 맨 아래가 아니라 총점 바로 아래에서 읽혀야 한다
+    md, html = render(result)
+    assert md.index("## 총평") < md.index("## 항목별 점수")
+    # 부록·항목별 근거는 길어서 기본으로 접는다 — md에서는 그대로 펼친다
+    assert re.search(r'<details class="fold"><summary>부록</summary>', html)
+    assert re.search(r'<details class="fold"><summary>항목별 근거</summary>', html)
+    assert "## 부록" in md and "## 항목별 근거" in md
+
+
+def test_hero_shows_biggest_loss_and_disclaimer(result):
+    # 순위 1번과 가장 큰 손실이 다를 수 있다 — 둘 다 첫 화면에, "예측 아님"은 접지 않고 늘 보이게
+    _, html = render(result)
+    hero = re.search(r'<section class="hero[^"]*">(.*?)</section>', html, re.S).group(1)
+    loss = result["losses"][0]
+    assert "가장 큰 손실" in hero and loss["name"] in hero and f"-{loss['lost']:.1f}" in hero
+    assert "실제 대회 점수의 예측이 아니다" in hero
+
+
+def test_fix_card_names_scale_and_max_gain(result):
+    _, html = render(result)
+    card = re.search(r'<div class="fix">(.*?)</div><span class="gain">', html, re.S).group(1)
+    f = result["fix_priority"][0]
+    assert "10점 척도" in card and f"최대 +{f['max_gain']:.1f}점" in card
+
+
+def test_accessibility_and_print(result):
+    _, html = render(result)
+    assert 'class="bars panel" role' not in html          # 막대 행 글이 화면낭독기에서 사라지지 않게
+    assert 'aria-label="100점 중 62.0점"' in html
+    assert "details::details-content" in html              # 인쇄할 때 접힌 안내·부록도 나온다
+
+
+def test_evidence_status_and_gaps_readable(contest_dir):
+    from evidence import summary
+    rubric = load_yaml(contest_dir / "rubric.yaml")
+    ledger = {"scope": "target", "subject": "s",
+              "sources": [{"id": "s1", "kind": "repo", "ref": "r", "how": "h", "trust": "self", "status": "ok"}],
+              "evidence": [], "absent": []}
+    r = aggregate(rubric, base_results(), run="x")
+    r["evidence"] = summary(ledger, rubric)
+    md, _ = render(r)
+    sec = md.split("## 확인한 자료와 빈칸")[1].split("\n## ")[0]
+    assert "| 확인함 |" in sec and "| ok |" not in sec
+    # 같은 항목의 빈칸은 한 줄로 묶어 무엇이 없는지 말한다
+    assert sum(1 for ln in sec.splitlines() if ln.startswith("- 실현 가능성")) == 1
+
+
+def test_grill_shows_base_run(contest_dir):
+    md, html = render({**GRILL, "based_on": "20261008-1405_score"})
+    assert "기준 회차 20261008-1405_score" in md

@@ -67,8 +67,8 @@ def test_fix_table_shows_one_unlock_hint(rubric):
     for n, res in enumerate(results):
         res["runs"][0]["items"]["feasibility"]["unlock_hint"] = f"배포 주소가 필요하다 {n}"
     md, _ = render_report.render(agg(rubric, results))
-    row = next(line for line in md.splitlines() if line.startswith("| 1 |"))
-    assert row.count("배포 주소가 필요하다") == 1
+    first = md.split("## 고칠 것 Top 5")[1].split("\n2. ")[0]  # 1순위 카드 하나
+    assert first.count("배포 주소가 필요하다") == 1
 
 
 # 없는 폴더를 주면 traceback 대신 한 줄 오류

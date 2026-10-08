@@ -50,19 +50,36 @@ def build(contest_dir: Path):
             for _, r in recent:
                 hit = next((i for i in r["items"] if i["id"] == item["id"]), None)
                 cells.append(f"{hit['earned']:g}" if hit else "-")
-            item_rows.append([f"{item['name']} ({item['points_total']:g})", *cells])
+            first = next((i for i in recent[0][1]["items"] if i["id"] == item["id"]), None)
+            # 여러 회차를 볼 때 궁금한 것은 "얼마나 올랐나"다 — 첫 열과 마지막 열 차이를 따로 둔다
+            change = f"{item['earned'] - first['earned']:+.1f}" if first and len(recent) > 1 else "-"
+            item_rows.append([f"{item['name']} ({item['points_total']:g})", *cells, change])
     links = [{"text": f"{p.name} {KIND_LABEL[p.name.split('_')[1].split('-')[0]]}",
               "href": f"runs/{p.name}/report.html"}
              for p in reversed(list_runs(contest_dir)) if (p / "report.html").is_file()][:RECENT_LINKS]
 
     dash = [{"type": "h1", "text": f"{name} 대시보드"},
-            {"type": "h2", "text": "총점 추이"},
-            ({"type": "bars", "rows": [{"label": p.name, "value": r["total"], "max": 100} for p, r in scored]}
-             if scored else {"type": "p", "text": "아직 채점 회차가 없음"}),
-            {"type": "h2", "text": "항목별 변화 (최근 회차)"},
-            {"type": "table", "headers": ["항목 (배점)", *[p.name for p, _ in recent]], "rows": item_rows},
-            {"type": "h2", "text": "최근 보고서"},
-            {"type": "links", "items": links}]
+            {"type": "meta", "items": [f"채점 {len(scored)}회"] + ([f"최근 {scored[-1][0].name}"] if scored else [])}]
+    if scored:
+        last = scored[-1][1]
+        sub = [f"대상 {last.get('target') or '-'}"]
+        if len(scored) > 1:
+            sub.append(f"직전 회차 대비 {last['total'] - scored[-2][1]['total']:+.1f}")
+            if len(scored) > 2:  # 회차가 둘이면 직전 = 첫 회차라 같은 말을 두 번 한다
+                sub.append(f"첫 회차 {scored[0][1]['total']:.1f}에서 {last['total'] - scored[0][1]['total']:+.1f}")
+        sub.append("진단 지표다. 실제 대회 점수의 예측이 아니다.")
+        top = (last.get("fix_priority") or [None])[0]
+        dash.append({"type": "hero", "score": last["total"], "max": 100, "caption": "최근 채점 총점", "sub": sub,
+                     "top_fix": {"name": top["name"], "gain": top["gain"], "anchor": top.get("next_anchor_text") or ""} if top else None,
+                     "loss": (last.get("losses") or [None])[0]})
+    dash += [{"type": "h2", "text": "총점 추이"},
+             ({"type": "bars", "rows": [{"label": f"{p.name} · {r.get('target') or '-'}", "value": r["total"], "max": 100}
+                                        for p, r in scored]}
+              if scored else {"type": "p", "text": "아직 채점 회차가 없음"}),
+             {"type": "h2", "text": "항목별 변화 (최근 회차)"},
+             {"type": "table", "headers": ["항목 (배점)", *[p.name for p, _ in recent], "변화"], "rows": item_rows},
+             {"type": "h2", "text": "최근 보고서"},
+             {"type": "links", "items": links}]
     return to_markdown(history_blocks), to_html(dash, f"{name} 대시보드")
 
 

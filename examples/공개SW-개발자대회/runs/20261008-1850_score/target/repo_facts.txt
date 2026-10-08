@@ -1,0 +1,729 @@
+# 저장소 사실: pro-judge (v0.4.3, 커밋 8cee7eb)
+
+- 전체 커밋 73개, 첫 커밋 2026-10-08, 파일 308개
+- 기간 커밋 73개, 작성자 2명 (처음~지금): SUH SAECHAN 50, GitHub Action 23
+- 월별 커밋: 2026-10 73
+- LICENSE: LICENSE
+- CONTRIBUTING: CONTRIBUTING.md · CODE_OF_CONDUCT: CODE_OF_CONDUCT.md
+- 테스트로 보이는 파일 24개
+- CI 워크플로우: .github/workflows/PROJECT-COMMON-AI-PR-SUMMARY.yaml, .github/workflows/PROJECT-COMMON-CLOSE-ISSUES-ON-RELEASE.yaml, .github/workflows/PROJECT-COMMON-QA-ISSUE-CREATION-BOT.yaml, .github/workflows/PROJECT-COMMON-README-VERSION-UPDATE.yaml, .github/workflows/PROJECT-COMMON-RELEASE-CHANGELOG.yaml
+
+## LICENSE (앞부분)
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+    
+
+## 최상위 구조 (파일 수)
+- "examples/ 18
+- .claude-plugin/ 2
+- .github/ 54
+- .gitignore 1
+- CHANGELOG.json 1
+- CHANGELOG.md 1
+- CODE_OF_CONDUCT.md 1
+- CONTRIBUTING.md 1
+- LICENSE 1
+- NOTICE 1
+- PROJECTOPS-SETUP-GUIDE.md 1
+- README.md 1
+- SECURITY.md 1
+- assets/ 3
+- hooks/ 2
+- pytest.ini 1
+- shared/ 28
+- site/ 14
+- skills/ 150
+- tests/ 24
+- tools/ 1
+- version.yml 1
+
+## 파일 README.md
+# pro-judge
+
+**대회에 내기 전에, 그 대회 심사위원에게 먼저 채점받는다.**
+
+공고와 심사기준을 주면 에이전트가 그 대회의 심사위원이 된다. 내 발표자료·레포·배포 서비스를 채점하고,
+**어디를 고치면 몇 점이 오르는지** 순서대로 알려 준다. Claude Code·Codex·Cursor에서 쓰는 Agent Skills다.
+
+**문서 사이트 → https://cassiiopeia.github.io/pro-judge/**
+
+<p align="center">
+  <img src="assets/report-desktop.png" alt="채점 보고서 — 총점, 항목별 막대, 고칠 것 순위" width="720">
+</p>
+
+<p align="center"><sub>이 레포를 「공개SW 개발자대회」 심사기준으로 채점한 실제 보고서 ·
+<a href="https://cassiiopeia.github.io/pro-judge/guide/reading-report">전체 보기</a></sub></p>
+
+## 설치
+
+```bash
+python3 -m pip install pyyaml
+npx skills add Cassiiopeia/pro-judge
+```
+
+Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiopeia/pro-judge` 후 `/plugin install pro-judge@pro-judge`.
+두 방식의 차이와 PDF 도구 선택은 [시작하기](https://cassiiopeia.github.io/pro-judge/guide/getting-started)에 있다.
+
+## 쓰기
+
+명령어 없이 말로 시킨다.
+
+| 하고 싶은 것 | 이렇게 말한다 |
+| --- | --- |
+| 대회 등록 | `이 대회 나갈 거야 <공고 URL·PDF>` |
+| 아이디어 비교 | `아이디어 3개 중 뭐가 점수 잘 나와?` |
+| 자료 채점 | `발표자료 몇 점이야? ./slides.pdf` · `이 레포 채점해줘` |
+| 질의응답 연습 | `질의응답 연습하자` |
+
+채점 전에 자료를 모으고, 빠진 근거는 웹에서 찾거나 하나씩 묻는다. 결과는 `docs/pro-judge/<대회>/`에 쌓이고 기본으로 git에서 빠진다.
+
+## 무엇이 다른가
+
+- **점수표부터 만든다** — 한 줄 기준도 판정 질문·0/5/10점 기준 문장·상한 규칙으로 펼친다
+- **심사위원마다 따로 채점** — 대회 구성을 따른 페르소나가 서로의 점수를 보지 않는다
+- **규칙은 코드로 강제** — 7점 이상은 원문 인용이 필요하고, 자료에 없는 인용은 지운다
+- **못 본 것도 남긴다** — 무엇을 봤고 무엇을 못 봤는지 근거 장부로 보고서에 드러난다
+
+[비슷한 도구(promptfoo·DeepEval)와의 비교](https://cassiiopeia.github.io/pro-judge/guide/compare)
+
+## 검증
+
+실제 수상 결과로 두 번 맞혀 봤다. 자세한 내용은 [검증 결과](https://cassiiopeia.github.io/pro-judge/validation).
+
+| 대회 | 결과 |
+| --- | --- |
+| 2025 오픈소스 개발자대회 (저장소) | 수상팀이 미수상팀보다 높게 나온 쌍 **29 / 36** (한 줄 프롬프트 26 / 36) |
+| 2025 장애인 분야 해커톤 (문서) | 분야별 장관상 2팀 중 **1팀**만 1위 — 발표·시연 인상은 보지 못한다 |
+
+수상 여부를 맞히는 도구가 아니라, **자료에서 무엇이 빠졌는지 짚는 진단 도구**다.
+
+## 기여
+
+[CONTRIBUTING.md](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · 질문은 [Discussions](https://github.com/Cassiiopeia/pro-judge/discussions) · 보안 문제는 [비공개 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new) · 라이선스 [Apache-2.0](LICENSE)
+
+---
+
+<!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
+## 최신 버전 : v0.4.3 (2026-10-08)
+
+[전체 버전 기록 보기](CHANGELOG.md)
+
+
+## 파일 .github/PULL_REQUEST_TEMPLATE.md
+## ✨ 변경 사항
+--- 
+<!-- 핵심적으로 변경된 사항들을 간략하게 서술해주세요. -> 예시: S3 업로드 기능 추가 -->
+
+
+## ✅ 테스트
+---
+
+- [ ] 수동 테스트 완료
+- [ ] 테스트 코드 완료
+
+
+## 파일 CODE_OF_CONDUCT.md
+# 행동 강령
+
+이 프로젝트의 이슈·PR·Discussions에서는 누구나 존중받으며 참여할 수 있어야 한다.
+
+## 지킬 것
+
+- 다른 의견과 경험을 존중한다
+- 비판은 코드·문서·결과에 대해 하고, 사람에 대해 하지 않는다
+- 실수를 인정하고, 영향을 받은 사람에게 사과한다
+- 이 프로젝트는 장애인 분야 대회도 다룬다. 장애를 동정·극복의 대상으로 그리는 표현을 쓰지 않는다
+
+## 하지 않을 것
+
+- 성적인 표현, 인신공격, 모욕적인 댓글
+- 괴롭힘, 공개적이거나 사적인 위협
+- 허락 없이 다른 사람의 개인 정보(주소·연락처·대회 자료)를 공개하는 일
+
+## 신고
+
+위반을 보거나 겪었으면 제목을 `[행동강령] 연락 요청`으로 한 이슈만 연다. 내용은 쓰지 않는다.
+관리자가 비공개로 연락해 사정을 듣는다. 신고한 사람의 신원은 공개하지 않는다.
+
+관리자는 위반에 대해 경고, 일시 참여 제한, 영구 참여 제한 중 하나를 정할 수 있다.
+
+## 출처
+
+[Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)을 바탕으로 줄여 썼다.
+
+
+## 파일 CONTRIBUTING.md
+# 기여 안내
+
+pro-judge에 이슈나 PR을 보내 주셔서 고맙습니다. 아래만 지키면 바로 리뷰할 수 있습니다.
+
+## 환경
+
+```bash
+python3 -m pip install pyyaml pytest
+python3 -m pip install pymupdf      # 선택: PDF 추출을 실제 파일로 돌려 볼 때 (AGPL-3.0 — pro-judge에 포함하지 않는다)
+python3 -m pytest                    # 모두 통과해야 PR을 받는다
+```
+
+Python 3.9 이상. 새 외부 의존성은 넣지 않는다 — PyYAML 하나만 필수다. PDF·OCR 도구는 있으면 쓰고 없으면 대체 경로로 간다.
+PyMuPDF(AGPL-3.0)·poppler(GPL)를 skill 폴더에 넣거나 함께 배포하지 않는다 — 사용자가 고른 도구를 설치해 쓰게 둔다.
+
+## 흐름
+
+1. 이슈를 먼저 연다. 버그는 재현 절차, 기능은 "어떤 대회 준비자가 무엇을 못 해서" 필요한지 적는다.
+2. `develop`에서 브랜치를 만든다. PR도 **`develop`으로** 연다. `main`은 릴리스 전용이다.
+3. 테스트를 먼저 쓰고(고치기 전에 실패하는 것을 확인), 고친 뒤 `python3 -m pytest`를 통과시킨다.
+4. PR 본문에 이슈 링크와 테스트 결과를 적는다.
+
+커밋 메시지 형식: `<이슈 제목> : <feat|fix|docs|refactor|test|chore> : <무엇을 왜> <이슈 URL>`
+
+## 자주 하는 변경
+
+### 스크립트·참고 문서를 고칠 때
+
+`skills/*/shared/`는 `shared/`의 사본이다. `npx skills`가 skill 폴더 하나만 복사하기 때문에 사본을 커밋한다.
+
+```bash
+# shared/ 를 고친 뒤
+python3 tools/sync_shared.py
+```
+
+사본을 직접 고치거나 sync를 빠뜨리면 `test_repo_copies_in_sync`가 실패한다.
+
+### 대회 종류를 추가할 때 (예: 스포츠 대회)
+
+세 곳을 함께 고친다. 하나라도 빠지면 `test_contest_types_listed_everywhere`가 실패한다.
+
+1. `shared/references/contest-types/<id>.md` — 기대, 보이지 않는 감점, 추천 상한 규칙, 취지 질문, 페르소나 후보
+   (`disability.md`를 본보기로)
+2. `shared/references/rubric-schema.md` — `purpose.contest_types` 줄의 목록
+3. `shared/scripts/validate_rubric.py` — `CONTEST_TYPES`
+
+그리고 `python3 tools/sync_shared.py`.
+
+상한 규칙과 기준 문장에는 **관찰 가능한 말**만 쓴다("잘했다·충분하다·적절하다·우수하다·훌륭하다"는 검사기가 거부한다).
+근거가 공고가 아니라 경험이면 `source: inferred`와 `why`를 단다.
+
+### 점수 계산을 바꿀 때
+
+`aggregate.py`의 숫자는 테스트(`tests/test_aggregate.py`, `tests/test_design_fixes.py`)에 손으로 계산한 기대값이 있다.
+계산을 바꾸면 기대값을 어떻게 다시 계산했는지 PR에 적는다. 같은 원자료에 다른 숫자가 나오는 변경은 이유가 필요하다.
+
+### 보고서 모양을 바꿀 때
+
+`examples/`의 보고서와 `assets/` 캡처는 생성물이다. 바꾼 뒤 다시 만들어 함께 커밋한다.
+
+```bash
+X=examples/공개SW-개발자대회
+python3 shared/scripts/render_report.py $X/runs/20261008-0957_score
+python3 shared/scripts/render_report.py $X/runs/20261008-1000_grill
+python3 shared/scripts/render_dashboard.py $X
+```
+
+### 문서 사이트를 고칠 때
+
+사이트(https://cassiiopeia.github.io/pro-judge/)의 원본은 `site/content/`의 md다. main에 반영되면 자동으로 배포된다.
+
+```bash
+cd site && npm ci && npm run docs:dev     # http://localhost:5173/pro-judge/
+```
+
+예시 보고서(`examples/`)와 캡처(`assets/`)는 빌드할 때 사이트로 복사된다. 사본(`site/content/public/`)을 고치지 않는다.
+
+## AI 기여 정책
+
+코딩 에이전트(Claude Code, Codex, Cursor 등)로 만든 이슈·PR을 받는다. 이 레포 자체가 에이전트로 만들어졌다. 다만:
+
+- **사람이 책임진다.** PR을 연 사람이 변경 전체를 읽고 이해한 상태여야 한다. 리뷰 질문에 "에이전트가 그렇게 했다"는 답이 되지 않는다.
+- **테스트가 증거다.** 동작을 바꾸는 PR은 고치기 전에 실패하는 테스트가 있어야 한다. 테스트 없는 대량 변경은 닫는다.
+- **실측을 적는다.** OCR·PDF·설치처럼 환경을 타는 변경은 어떤 OS에서 무엇을 실제로 돌렸는지 적는다. 돌려 보지 못했으면 "미실측"이라고 쓴다.
+- **숫자를 지어내지 않는다.** README·문서의 수치(검증 결과, 지원 수 등)는 측정한 것만 쓴다. 측정 방법을 PR에 적는다.
+- **범위를 지킨다.** 이슈와 무관한 리팩터링·포맷 변경을 섞지 않는다.
+- AI 서명 줄(`Co-Authored-By` 등)은 넣어도 되고 빼도 된다.
+
+## 신고
+
+보안 문제(예: 채점 대상 파일로 임의 명령이 실행되는 경우)는 공개 이슈에 쓰지 않고 GitHub의
+[비공개 취약점 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new)로 알려 준다.
+
+
+## 파일 PROJECTOPS-SETUP-GUIDE.md
+# 🚀 projectops 빠른 시작 가이드
+
+> **지금 당장 해야 하는 것은 하나뿐입니다.** 나머지는 나중에 필요해지면 하세요.
+
+설치는 이미 끝났습니다. 아래 표만 보고 필요한 것을 고르세요.
+
+| | 해야 하나? | 안 하면 | 걸리는 시간 |
+|---|---|---|---|
+| **① 개발 브랜치 만들기** | **네, 지금** | 릴리스를 못 합니다 | 10초 |
+| ② AI 요약 키 등록 | 아니오 (선택) | 릴리스 노트가 커밋 목록 정리본으로 나옵니다 | 2분 |
+| ③ PAT 등록 | 아니오 (선택) | 브랜치 보호 규칙이 있으면 자동 머지가 막힐 수 있습니다 | 3분 |
+| ④ CodeRabbit | 통합 때 골랐다면 | PR에 코드 리뷰 댓글이 안 달립니다 | 2분 |
+| ⑤ 템플릿 라벨 만들기 | 권장 | `status: todo`·`status: in progress`(기존 한글 표기는 `작업전`·`작업중`) 같은 상태 라벨이 레포에 없어 라벨 자동화가 조용히 무시됩니다 | 30초 |
+
+**①만 하면 바로 쓸 수 있습니다.**
+
+> 💰 **기본 구성은 전부 무료이며 한도가 없습니다.** 릴리스 노트는 커밋 내용을 분석해
+> 만들기 때문에 외부 서비스를 쓰지 않습니다. ②·④는 품질을 올리고 싶을 때만 선택하세요.
+
+---
+
+## ① 개발 브랜치 만들기 (필수)
+
+```bash
+git checkout -b develop
+git push -u origin develop
+git checkout main
+```
+
+**왜 필요한가**: 이 템플릿은 `develop`에 개발을 모았다가 `develop → main` PR로 릴리스합니다.
+그 PR이 만들어지는 순간 버전 확정·릴리스 노트 생성·자동 머지가 돌아갑니다.
+`develop`이 없으면 그 흐름이 시작되지 않습니다.
+
+> 다른 이름을 쓰고 싶으면 `version.yml`의 `metadata.deploy_branch`를 바꾸세요.
+
+---
+
+## ② AI 요약 키 등록 (선택)
+
+**등록하지 않아도 릴리스 노트는 나옵니다.** 커밋 메시지를 분석해 이렇게 만듭니다.
+
+```
+**새 기능**
+* 소셜 로그인 버튼 추가
+
+**버그 수정**
+* 카드 중복 청구 문제 해결
+```
+
+AI가 다듬은 문장을 원할 때만 아래를 따르세요.
+
+**1. 키 발급** — [Google AI Studio](https://aistudio.google.com/apikey) (무료, 신용카드 불필요)
+
+> 결제 계정이 **연결되지 않은** 새 프로젝트로 키를 만들면 무료 등급입니다.
+> 일 500회까지 쓸 수 있어 일반적인 릴리스 빈도에는 충분합니다.
+
+**2. 저장소에 등록** — Settings → Secrets and variables → Actions → New repository secret
+
+| Name | Secret |
+|---|---|
+| `GEMINI_API_KEY` | 발급받은 키 (`AIza...` 로 시작) |
+
+**다른 서비스를 쓴다면** 이름만 바꿔 등록하세요. 등록한 것이 자동으로 쓰입니다.
+
+| 서비스 | Secret 이름 | 무료 |
+|---|---|---|
+| Google Gemini | `GEMINI_API_KEY` | ✅ |
+| Groq | `GROQ_API_KEY` | ✅ |
+| Mistral | `MISTRAL_API_KEY` | ✅ |
+| OpenAI | `OPENAI_API_KEY` | ❌ |
+| Anthropic | `ANTHROPIC_API_KEY` | ❌ |
+
+**동작 방식** — 설정은 이것뿐입니다. 나머지는 자동입니다.
+
+```
+릴리스 PR 생성
+  → PR 본문에 릴리스 노트가 이미 있으면 그대로 사용
+  → 없으면 등록한 키로 AI 요약 (키가 없으면 건너뜀)
+  → 그래도 안 되면 커밋 내용으로 정리   ← 항상 성공한다
+```
+
+> **기본 경로에는 요금이 발생하는 요소가 없습니다.** 아무 설정도 하지 않으면
+> 커밋 분석만 돌며, 이는 무제한·무료입니다.
+
+어느 경로로 만들어졌는지는 **Actions 실행 요약**에 매번 기록됩니다.
+AI를 하나도 쓰지 못한 경우에만 PR에 안내 댓글이 **한 번** 달립니다.
+
+> 한도를 넘기거나 키가 잘못돼도 릴리스는 멈추지 않습니다. 커밋 분석으로 내려갈 뿐입니다.
+
+---
+
+## ③ GitHub Personal Access Token (선택)
+
+**없어도 릴리스는 정상 동작합니다.** 브랜치 보호 규칙을 걸어둔 저장소에서
+자동 머지가 막힐 때만 필요합니다.
+
+#### 토큰 생성
+1. **GitHub** → **Settings** → **Developer settings** → **Personal access tokens (Classic)**
+2. **Generate new token (classic)** 클릭
+3. 토큰 설정:
+   - **Name**: `_GITHUB_PAT_TOKEN`
+   - **Expiration**: 90 days (또는 조직 정책에 따라)
+   - **Scopes**: ✅ `repo` (Full control), ✅ `workflow` (Update workflows)
+4. **Generate token** 클릭 후 토큰 복사
+
+#### Secret 등록
+1. **프로젝트 저장소** → **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret** 클릭
+3. **Name**: `_GITHUB_PAT_TOKEN`
+4. **Secret**: [위에서 복사한 토큰 값 붙여넣기]
+5. **Add secret** 클릭
+
+---
+
+## ④ CodeRabbit 활성화 (통합 때 골랐다면)
+
+| | 무료 | 유료 |
+|---|---|---|
+| 대상 | **공개 저장소만** | 비공개 포함 |
+| 한도 | **시간당 3회** 리뷰 | 플랜에 따라 상향 |
+
+공개 저장소는 영구 무료지만 시간당 3회 제한이 있습니다. PR을 연달아 올리면 리뷰가
+밀릴 수 있습니다. **비공개 저장소는 무료 플랜이 없습니다.**
+
+> CodeRabbit은 **코드 리뷰**만 담당합니다. 릴리스 노트는 위 ②의 사다리가 만들므로
+> CodeRabbit이 느리거나 한도에 걸려도 릴리스는 기다리지 않고 진행됩니다.
+
+
+통합 시 **CodeRabbit 코드 리뷰**를 선택한 경우에만 필요합니다.
+
+1. [CodeRabbit 웹사이트](https://coderabbit.ai) 접속
+2. GitHub 계정으로 로그인
+3. 저장소 목록에서 프로젝트 선택하여 활성화
+4. `.coderabbit.yaml` 파일이 프로젝트에 있으면 자동으로 설정 적용됨
+
+**설명**: CodeRabbit은 AI 기반 코드 리뷰를 담당합니다. 이 단계를 건너뛰면 워크플로우가
+켜져 있어도 PR에 리뷰 댓글이 달리지 않습니다.
+
+## ⑤ 템플릿 라벨 만들기 (권장)
+
+라벨 동기화 워크플로우는 `.github/config/issue-labels.yml`이 **바뀐 push에서만** 자동 실행됩니다.
+설치 직후 첫 push에서는 실행되지 않을 수 있어, 새 레포에는 `status: todo`·`status: in progress`·`status: done`(한글 표기 레포는 `작업전`·`작업중`·`작업완료`)
+같은 템플릿 라벨이 아직 없을 수 있습니다. 한 번만 직접 실행하세요.
+
+1. 저장소의 **Actions** 탭 → 왼쪽에서 **PROJECT-SYNC-GITHUB-LABELS** 선택
+2. **Run workflow** 버튼 → 실행
+3. 저장소 **Issues → Labels** 에서 라벨이 생겼는지 확인
+
+**왜 필요한가**: 라벨이 없으면 이슈에 `status: todo`(또는 `작업전`)을 지정해도 조용히 무시되고,
+Projects 상태 동기화 같은 라벨 기반 자동화도 동작하지 않습니다.
+
+---
+
+## 🛠️ IDE 도구 (Skills) 설치 (선택)
+
+npx projectops로 통합 시 자동 안내되지만, 수동으로도 설치할 수 있습니다.
+
+| IDE | 설치 방법 | 사용 예시 |
+|-----|----------|----------|
+| **Claude Code** | 플러그인 마켓플레이스 (CLI) | `/pro-analyze`, `/pro-review` |
+| **Cursor** | `.cursor/skills/` 폴더 복사 | Skills 패널에서 선택 |
+| **Gemini CLI** | `gemini extensions install` | extension 명령 |
+| **Codex CLI** | `codex plugin marketplace add` | `/plugins`에서 확인 |
+
+### Claude Code
+
+```bash
+# 마켓플레이스 등록 + 플러그인 설치
+claude plugin marketplace add Cassiiopeia/projectops
+claude plugin install projectops@projectops-marketplace --scope user
+```
+
+### Cursor
+
+`npx projectops` 실행 시 Cursor 설치를 선택하면 자동으로 `skills/` → `.cursor/skills/`로 복사됩니다.
+
+---
+
+## ✅ 제대로 됐는지 확인하기
+
+언제든 아래 명령으로 현재 상태를 진단할 수 있습니다.
+
+```bash
+npx projectops --mode doctor
+```
+
+저장소 설정까지 보려면 토큰을 함께 넘기세요.
+
+```bash
+GITHUB_TOKEN=ghp_... npx projectops --mode doctor
+```
+
+### 첫 릴리스를 돌려보기
+
+```bash
+git checkout develop
+git commit --allow-empty -m "첫 릴리스 테스트 : feat : 자동화 동작 확인"
+git push origin develop
+```
+
+그다음 GitHub에서 `develop → main` PR을 만들면 자동으로 진행됩니다.
+
+| 순서 | 일어나는 일 |
+|---|---|
+| 1 | 버전이 확정됩니다 (`feat`이 있으면 minor, 아니면 patch) |
+| 2 | 릴리스 노트가 만들어져 PR 본문에 들어갑니다 |
+| 3 | `CHANGELOG.md` · `CHANGELOG.json`이 갱신됩니다 |
+| 4 | PR이 자동 머지됩니다 |
+
+Actions 탭의 실행 요약에서 **릴리스 노트가 어떤 경로로 만들어졌는지** 확인할 수 있습니다.
+
+---
+
+## 🎉 완료!
+
+**이제 코드를 푸시하면 모든 자동화가 작동합니다.**
+
+- ✅ 버전 자동 증가 (1.0.0 → 1.0.1)
+- ✅ README 버전 자동 업데이트
+- ✅ Git 태그 자동 생성
+- ✅ 체인지로그 자동 생성
+
+---
+
+## ✨ 자동으로 처리되는 것들
+
+### 템플릿 사용 시 (GitHub "Use this template")
+
+**프로젝트 생성 즉시 자동 실행**:
+- ✅ `version.yml` 자동 생성 (v0.0.0, basic 타입)
+- ✅ 공통 워크플로우 자동 설치 (주요 항목):
+  - `PROJECT-COMMON-VERSION-CONTROL.yaml` (버전 자동 관리)
+  - `PROJECT-COMMON-RELEASE-CHANGELOG.yaml` (체인지로그 생성)
+  - `PROJECT-COMMON-README-VERSION-UPDATE.yaml` (README 업데이트)
+  - `PROJECT-COMMON-SUH-ISSUE-HELPER-MODULE.yml` (이슈 브랜치/커밋 제안)
+  - `PROJECT-COMMON-QA-ISSUE-CREATION-BOT.yaml` (QA 이슈 자동 생성)
+  - `PROJECT-COMMON-SYNC-ISSUE-LABELS.yaml` (라벨 동기화)
+  - `PROJECT-COMMON-PROJECTS-SYNC-MANAGER.yaml` (Projects 상태 동기화)
+- ✅ README 버전 섹션 자동 추가
+- ✅ 불필요한 템플릿 파일 자동 삭제
+- ✅ Default 브랜치 자동 감지
+
+---
+
+### 원격 스크립트 사용 시 (기존 프로젝트에 통합)
+
+```bash
+# 대화형 모드 (권장)
+npx projectops
+
+# 비대화형 모드 (Spring Boot 전체 통합 예시)
+npx projectops \
+  --mode full --type spring --version 1.0.0 --force
+```
+
+**자동으로 수행되는 작업**:
+- ✅ 프로젝트 타입 자동 감지 (Spring, Flutter, React, Node, Python 등) — 한 레포에 여러 타입이 섞인 모노레포는 멀티타입으로 함께 인식
+- ✅ 현재 버전 자동 감지 (Git 태그, build.gradle, package.json 등)
+- ✅ 프로젝트 타입에 맞는 워크플로우만 선택 복사
+- ✅ `version.yml` 자동 생성
+- ✅ README에 버전 섹션 자동 추가
+- ✅ 버전 관리 스크립트 자동 설치
+
+**지원하는 프로젝트 타입**:
+- `spring` - Spring Boot / Java / Gradle
+- `flutter` - Flutter / Dart
+- `react` - React.js / Next.js
+- `react-native` - React Native (iOS + Android)
+- `react-native-expo` - Expo 기반 React Native
+- `node` - Node.js / Express
+- `python` - Python / FastAPI / Django
+- `basic` - 기본 타입 (버전 관리만)
+
+---
+
+### 매 커밋마다 자동 실행
+
+#### main 브랜치 푸시 시
+- ✅ 커밋 메시지 분석 (`feat:`, `fix:`, `docs:` 등)
+- ✅ 버전 자동 증가 (1.0.0 → 1.0.1)
+- ✅ README 버전 자동 업데이트
+- ✅ Git 태그 자동 생성 (`v1.0.1`)
+- ✅ 프로젝트별 버전 파일 동기화:
+  - Spring: `build.gradle` 또는 `pom.xml`
+  - Flutter: `pubspec.yaml`
+  - React/Node: `package.json`
+  - React Native: `package.json`, `ios/Info.plist`, `android/build.gradle`
+  - Python: `pyproject.toml`
+
+#### develop → main 릴리스 PR 생성 시
+- ✅ CodeRabbit AI 자동 코드 리뷰
+- ✅ 체인지로그 자동 생성 (`CHANGELOG.json`, `CHANGELOG.md`)
+- ✅ PR 자동 머지 (리뷰 통과 시)
+
+---
+
+## 🏢 Organization 사용 시 추가 설정
+
+Organization 저장소에서는 아래 3가지 추가 설정이 필요합니다:
+
+### 1. Actions 설정
+```
+Organization Settings → Actions → General
+├── ✅ Allow GitHub Actions to create and approve pull requests
+└── ✅ Allow GitHub Actions to merge pull requests
+```
+
+### 2. Repository 설정
+```
+Repository Settings → General → Pull Requests
+├── ✅ Allow auto-merge
+└── ✅ Allow squash merging
+```
+
+### 3. Member 권한 확인
+```
+Organization Settings → Member privileges
+└── Personal access token expiration policy: 조직 정책에 맞게 설정
+```
+
+💡 **개인 저장소는 추가 설정 불필요합니다.**
+
+---
+
+## 🧪 동작 확인
+
+### 첫 번째 테스트: 버전 자동 증가
+
+```bash
+# main 브랜치에 테스트 커밋
+echo "# 테스트" >> TEST.md
+git add TEST.md
+git commit -m "test: 자동화 테스트"
+git push origin main
+```
+
+**예상 결과** (GitHub Actions 탭에서 확인):
+1. `PROJECT-COMMON-VERSION-CONTROL` 워크플로우 실행
+2. 버전 자동 증가 (예: v0.0.0 → v0.0.1)
+3. Git 태그 `v0.0.1` 자동 생성
+4. README 버전 자동 업데이트
+
+---
+
+### 두 번째 테스트: 체인지로그 자동 생성
+
+```bash
+# feature 브랜치 생성 및 작업
+git checkout -b feature/test-changelog
+echo "# 체인지로그 테스트" >> TEST2.md
+git add TEST2.md
+git commit -m "feat: 체인지로그 테스트 기능"
+git push origin feature/test-changelog
+
+# GitHub에서 develop 브랜치로 PR 생성 (feature → develop)
+# 이후 develop → main 릴리스 PR 생성 시 체인지로그가 자동 생성됩니다
+```
+
+**예상 결과**:
+1. CodeRabbit AI 자동 리뷰
+2. `CHANGELOG.json`, `CHANGELOG.md` 자동 생성
+3. PR 자동 머지 (리뷰 통과 시)
+
+---
+
+## 🚨 자주 묻는 질문
+
+### Q1: 워크플로우가 실행되지 않아요
+
+**원인**: `develop` 브랜치에 워크플로우 파일이 없을 수 있습니다.
+
+**해결**:
+```bash
+git checkout develop
+ls .github/workflows/
+
+# 파일이 없다면 main에서 복사
+git checkout main
+git checkout develop
+git merge main
+git push origin develop
+```
+
+---
+
+### Q2: 토큰 권한 오류가 발생해요
+
+**증상**:
+```
+remote: Permission to ... denied to github-actions[bot]
+```
+
+**해결**:
+1. 토큰이 **Classic** 타입인지 확인 (Fine-grained 아님)
+2. `repo`, `workflow` 권한 **모두** 체크되었는지 확인
+3. Organization 설정에서 PAT 정책 확인
+4. 토큰 만료 날짜 확인
+
+---
+
+### Q3: 버전이 동기화되지 않아요
+
+**해결**: 수동 동기화 실행
+```bash
+# 현재 버전 상태 확인
+.github/scripts/version_manager.sh get
+
+# 모든 파일 동기화
+.github/scripts/version_manager.sh sync
+
+# 특정 버전으로 강제 설정
+.github/scripts/version_manager.sh set 1.0.0
+```
+
+---
+
+### Q4: CodeRabbit 리뷰가 동작하지 않아요
+
+**확인 사항**:
+1. `.coderabbit.yaml` 파일이 프로젝트 루트에 있는지 확인
+2. CodeRabbit이 저장소에 액세스 권한이 있는지 확인
+3. PR에 충분한 변경사항이 있는지 확인 (1줄 이상)
+
+---
+
+### Q5: Spring Boot 프로젝트인데 Nexus 배포 워크플로우가 없어요
+
+**답변**: Nexus 워크플로우는 Spring 타입 선택 시 자동으로 복사됩니다:
+- `PROJECT-SPRING-NEXUS-CI.yml`
+- `PROJECT-SPRING-NEXUS-PUBLISH.yml`
+
+**추가 설정 필요**:
+1. GitHub Secrets에 Nexus 인증 정보 등록:
+   - `NEXUS_USERNAME`
+   - `NEXUS_PASSWORD`
+   - `NEXUS_URL`
+2. `gradle.properties` 또는 `build.gradle`에 Nexus 저장소 설정
+
+---
+
+## 📚 추가 문서
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - 상세 기여 가이드 및 워크플로우 설명
+- [CHANGELOG.md](CHANGELOG.md) - 전체 변경 이력
+- [README.md](README.md) - 프로젝트 개요 및 빠른 시작
+
+---
+
+## 💡 다음 단계
+
+### 프로젝트 타입 변경하려면?
+
+```bash
+# 원격 스크립트로 타입 변경 
+npx projectops
+```
+
+### 고급 기능 활용
+
+1. **수동 워크플로우 실행**: GitHub Actions 탭에서 `workflow_dispatch` 트리거 활용
+2. **멀티 환경 배포**: `version.yml`에 환경별 설정 추가
+3. **커스텀 워크플로우**: `.github/workflows/`에 프로젝트별 워크플로우 추가 가능
+
+---
+
+**🎉 축하합니다! 이제 완전 자동화된 DevOps 환경이 구축되었습니다.**
+
+추가 질문이나 문제가 있다면 [이슈를 생성](https://github.com/Cassiiopeia/projectops/issues/new/choose)해 주세요.
+

@@ -1,0 +1,74 @@
+{
+  "persona": "industry-dev",
+  "model": "sonnet",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 7,
+      "items": {
+        "code-structure": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "skills/*/shared/ 사본을 없애 같은 코드가 2곳에 복사돼 있지 않으면 7점 이상. 현재는 사본 커밋 방식이라 5점입니다."
+        },
+        "code-completeness": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "README에 테스트 N개 통과 결과와 3분 시연 영상이 있으면 10점에 가까워집니다. 테스트 함수 147개는 있으나 통과 수를 보여 주는 기록이 없습니다. 돌려 봤나요?"
+        },
+        "doc-specificity": {
+          "score": 7,
+          "quotes": [
+            "판단은 에이전트가, 숫자는 스크립트가 맡는다.",
+            "`skills/*/shared/`는 `shared/`의 사본이다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": "구조도와 파일 경로, 명령 예시가 있어 7점. 모듈별 책임 설명과 기능 추가 시 고칠 파일 목록이 더 있으면 9점 이상입니다."
+        },
+        "project-level": {
+          "score": 6,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "합산·인용 대조·상한 강제 로직이 직접 구현돼 있으나 기술적 난점을 따로 설명한 문서와 그 부분의 테스트 대응이 원문에서 확인되지 않아 6점. 난점 2개 이상을 문서에 쓰고 테스트와 연결하면 8점 이상입니다. 커밋 73개가 모두 하루에 몰려 있어 개발 기간 수치도 없습니다."
+        },
+        "presentation": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 상한 3을 넘습니다. 문제 규모와 결과 숫자가 든 자료면 10점까지 갑니다."
+        },
+        "oss-usage": {
+          "score": 7,
+          "quotes": [
+            "npx skills add Cassiiopeia/pro-judge"
+          ],
+          "cap_applied": null,
+          "unlock_hint": "Apache-2.0 LICENSE, NOTICE, 설치 명령이 있어 7점. 의존성(PyYAML 등)과 각 라이선스를 표로 정리한 목록이 레포에 있으면 10점입니다."
+        },
+        "originality": {
+          "score": 8,
+          "quotes": [
+            "promptfoo와 DeepEval은 LLM 애플리케이션의 출력을 테스트하는 범용 평가 프레임워크다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": "promptfoo, DeepEval 2개를 이름으로 비교하고 인용 대조·상한 강제가 aggregate.py에 구현돼 있어 8점. 비교 표의 차별 항목마다 해당 코드 위치를 적으면 10점입니다."
+        },
+        "community-potential": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "CONTRIBUTING·행동 강령·SECURITY는 있으나 외부 기여자와 외부 이슈가 0건이고 커밋은 하루(2026-10-08)에 몰려 있습니다. 외부 기여자 N명·이슈 N건과 담당·기간이 적힌 유지 계획이 있으면 7점 이상입니다."
+        },
+        "demo": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "3분 시연 동영상이 레포와 사이트 어디에도 없습니다. 예제 보고서 HTML과 GIF는 결과물이지 입력부터 보여 주는 시연이 아닙니다. 핵심 기능을 실제 입력으로 보여 주는 영상이나 단계별 시나리오가 있으면 상한 5를 넘습니다."
+        }
+      },
+      "summary": "코드는 shared/ 원본을 skills/*/shared/에 복사하는 구조라 중복이 남고, 테스트 함수는 147개인데 통과 수 기록이 없어 구조와 완성도는 5점입니다. 문서와 독창성은 근거가 있어 점수를 줬지만, 발표자료와 3분 시연 영상이 없어 발표 3점, 데모 4점입니다. 외부 기여자와 외부 이슈가 0건이고 커밋이 하루에 몰려 커뮤니티 항목도 5점에 그쳤습니다."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# pro-judge
+# PRO-Judge
 
 **대회에 내기 전에, 그 대회 심사위원에게 먼저 채점받는다.**
 
@@ -35,6 +35,11 @@ Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiop
 | 자료 채점 | `발표자료 몇 점이야? ./slides.pdf` · `이 레포 채점해줘` |
 | 질의응답 연습 | `질의응답 연습하자` |
 
+<p align="center">
+  <a href="https://cassiiopeia.github.io/pro-judge/#대화로-쓴다"><img src="assets/conversation-demo.png" alt="Claude Code에서 채점 결과를 요약하고 질의응답을 연습하는 실제 대화" width="720"></a>
+</p>
+<p align="center"><sub>실제 대화 2분 영상(편집 없음) — 이미지를 누르면 문서 사이트에서 재생된다</sub></p>
+
 채점 전에 자료를 모으고, 빠진 근거는 웹에서 찾거나 하나씩 묻는다. 결과는 `docs/pro-judge/<대회>/`에 쌓이고 기본으로 git에서 빠진다.
 
 ## 무엇이 다른가
@@ -64,6 +69,6 @@ Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiop
 ---
 
 <!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
-## 최신 버전 : v0.4.2 (2026-10-08)
+## 최신 버전 : v0.4.3 (2026-10-08)
 
 [전체 버전 기록 보기](CHANGELOG.md)

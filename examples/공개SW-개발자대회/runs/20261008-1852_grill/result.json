@@ -1,0 +1,130 @@
+{
+  "kind": "grill",
+  "contest": "제10회 공개SW 개발자대회",
+  "created_at": "2026-10-08T18:52",
+  "mode": "practice",
+  "questions": [
+    {
+      "persona": "community-lead",
+      "item": "community-potential",
+      "question": "커밋 73개가 전부 하루에 몰려 있습니다. 대회가 끝난 뒤 누가 이슈에 답하나요?",
+      "answer": "관리자 1명이 사용자 이슈 양식 3개(버그·채점 결과 질문·대회 종류 요청)로 받고 있습니다. 응답 기한과 유지 기간은 문서에 적지 않았습니다.",
+      "verdict": "same",
+      "reason": "담당은 밝혔지만 기한·기간 숫자가 없다",
+      "model_answer": null,
+      "follow_ups": [
+        {
+          "question": "지금까지 외부에서 들어온 이슈나 PR은 몇 건인가요?",
+          "answer": "0건입니다.",
+          "verdict": "same",
+          "reason": "사실이지만 점수를 올릴 근거는 아니다"
+        }
+      ]
+    },
+    {
+      "persona": "industry-dev",
+      "item": "demo",
+      "question": "3분 시연 영상이 없습니다. 공고를 넣는 데서 보고서가 나오기까지를 지금 보여 줄 수 있나요?",
+      "answer": "문서 사이트에 예제 보고서와 대시보드가 열려 있고, README에 보고서 화면을 훑는 GIF가 있습니다. 공고 입력부터 찍은 영상은 아직 없습니다.",
+      "verdict": "same",
+      "reason": "결과 화면만 있고 입력부터의 시연은 없다",
+      "model_answer": null,
+      "follow_ups": [
+        {
+          "question": "설치부터 첫 보고서까지 몇 분 걸리나요?",
+          "answer": "재 본 적이 없습니다.",
+          "verdict": "same",
+          "reason": "측정 기록 없음 — 영상을 만들면서 함께 재면 된다"
+        }
+      ]
+    },
+    {
+      "persona": "academic",
+      "item": "project-level",
+      "question": "수상작을 맞힌다고 하셨는데, 근거 숫자가 있나요?",
+      "answer": "2025 오픈소스 개발자대회 수상 6팀과 우수작 6팀, 36쌍에서 수상팀이 높게 나온 쌍이 29쌍(0.81)입니다. 같은 배점을 준 한 줄 프롬프트는 26쌍이었습니다. 장애인 해커톤에서는 장관상 2팀 중 1팀만 맞혔고, 그것도 검증 페이지에 그대로 적었습니다.",
+      "verdict": "up",
+      "reason": "검증 숫자와 비교 기준, 실패 사례까지 댔다",
+      "model_answer": null,
+      "follow_ups": [
+        {
+          "question": "12팀에서 3쌍 차이면 우연과 구분되나요?",
+          "answer": "구분되지 않습니다. 표본이 작아 경향으로만 읽는다고 검증 페이지 한계 절에 적었습니다.",
+          "verdict": "same",
+          "reason": "한계를 인정했다 — 표본을 늘리기 전에는 더 올라가지 않는다"
+        }
+      ]
+    },
+    {
+      "persona": "verifier",
+      "item": "function-test",
+      "question": "기능테스트 근거가 문서에 없습니다. 테스트가 몇 개이고 통과하나요?",
+      "answer": "pytest 160개가 v0.4.3에서 모두 통과합니다. 지금은 로컬에서만 돌리고 CI에서는 돌리지 않습니다.",
+      "verdict": "up",
+      "reason": "통과 수를 숫자로 댔다 — 다만 자료의 숫자와 맞는지 확인이 필요하다",
+      "model_answer": null,
+      "follow_ups": [
+        {
+          "question": "자료에는 테스트 함수가 147개라고 나옵니다. 160개는 무엇을 센 숫자인가요?",
+          "answer": "pytest가 수집한 테스트 수입니다. 같은 함수를 입력만 바꿔 여러 번 도는 매개변수 테스트(parametrize)가 3개 파일에 있어 147개 함수가 160개 테스트로 펼쳐집니다. `python3 -m pytest --collect-only -q` 마지막 줄이 '160 tests collected'입니다.",
+          "verdict": "up",
+          "reason": "차이를 설명하고 확인 명령까지 댔다"
+        }
+      ]
+    },
+    {
+      "persona": "academic",
+      "item": "originality",
+      "question": "promptfoo로 루브릭을 쓰면 되지 않나요? 왜 따로 만들었나요?",
+      "answer": "promptfoo llm-rubric은 출력 하나를 기준 문장 하나로 통과·실패를 봅니다. PRO-Judge는 공고에서 점수표를 펼치고, 심사위원별로 따로 채점하고, 원문에 없는 인용을 지우고, 고칠 것을 오르는 점수 순으로 냅니다. 비교표가 문서 사이트에 있습니다.",
+      "verdict": "up",
+      "reason": "도구 이름과 차이를 구체적으로 댔고 문서 위치가 있다",
+      "model_answer": null,
+      "follow_ups": []
+    },
+    {
+      "persona": "community-lead",
+      "item": "oss-usage",
+      "question": "의존성 라이선스 목록은 어디 있나요?",
+      "answer": "필수 의존성이 PyYAML 하나라 따로 목록은 안 만들었습니다. 아마 MIT일 겁니다.",
+      "verdict": "down",
+      "reason": "확인하지 않은 추측 — 목록 파일 하나면 끝나는 질문이다",
+      "model_answer": null,
+      "follow_ups": []
+    },
+    {
+      "persona": "industry-dev",
+      "item": "presentation",
+      "question": "10분 발표에서 문제 규모를 어떤 숫자로 보여 주나요?",
+      "answer": "발표자료를 아직 만들지 않았습니다. 넣는다면 검증 숫자(29/36)와 이 레포가 24.2점에서 54.3점이 된 과정을 쓰겠습니다.",
+      "verdict": "same",
+      "reason": "발표자료가 없다 — 쓸 숫자는 이미 있다",
+      "model_answer": null,
+      "follow_ups": []
+    }
+  ],
+  "suggestions": [
+    {
+      "evidence": "README에 'pytest 160개 통과(함수 147개, 매개변수 포함)'와 실행 명령",
+      "item": "function-test",
+      "from_score": 2,
+      "to_score": 5
+    },
+    {
+      "evidence": "README 첫 화면에 검증 숫자(29/36, 한 줄 프롬프트 26/36)",
+      "item": "project-level",
+      "from_score": 6,
+      "to_score": 7
+    },
+    {
+      "evidence": "의존성 라이선스 목록(PyYAML MIT 등) 파일",
+      "item": "oss-usage",
+      "from_score": 7,
+      "to_score": 10
+    }
+  ],
+  "narrative": {
+    "overall": "답변은 이 레포의 실제 사실로 작성한 연습 예시다. 가장 약했던 답은 의존성 라이선스(추측으로 답함)와 유지 계획(기한·기간 없음)이다. 숫자를 댄 답(검증 29/36, 테스트 160개)은 판정이 올랐고, 자료와 숫자가 다르면(함수 147개) 꼬리 질문으로 확인했다. 이 숫자들이 아직 README·발표자료에 없다는 것이 문제다. 발표자료와 시연 영상이 없어 발표·데모 질문에는 '아직 없다'로만 답했다."
+  },
+  "based_on": "20261008-1850_score"
+}

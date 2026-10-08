@@ -184,3 +184,24 @@ def test_cli_group_failed_exit(contest_dir, capsys):
         run_cli(lambda: aggregate.main([str(run)]))
     assert e.value.code == 2
     assert "citizens" in capsys.readouterr().err
+
+
+def test_consensus_needs_two_models_on_that_item(rubric):
+    # 심사위원 1명만 채점한 항목은 "모델 2종 이상이 같은 판단"이 될 수 없다 — 회차 전체 모델 수로 판정하던 오류
+    rb = copy.deepcopy(rubric)
+    next(i for i in rb["items"] if i["id"] == "impact")["points"] = {"citizens": 15}
+    results = [
+        persona_result("developer", {"feasibility": 4}, model="opus"),
+        persona_result("domain-expert", {"feasibility": 5}, model="sonnet"),
+        persona_result("citizen", {"feasibility": 3, "impact": 2}, model="haiku"),
+    ]
+    assert agg(rb, results)["consensus_gaps"] == ["feasibility"]
+
+
+def test_losses_and_max_gain(rubric):
+    # 순위는 다음 기준까지 오르는 점수 그대로, 대신 못 받은 점수를 함께 낸다 — 배점 큰 항목의 손실이 묻히지 않게
+    r = agg(rubric, base_results())
+    feas = next(f for f in r["fix_priority"] if f["item"] == "feasibility")
+    assert feas["max_gain"] == 23.0                           # 55-32
+    assert r["losses"][0] == {"item": "feasibility", "name": "실현 가능성", "lost": 23.0, "caps": []}
+    assert [x["lost"] for x in r["losses"]] == sorted((x["lost"] for x in r["losses"]), reverse=True)

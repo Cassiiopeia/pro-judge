@@ -34,7 +34,7 @@ def test_report_shows_sources_and_gaps(run):
     md, html = render(load_json(run / "result.json"))
     assert "## 확인한 자료와 빈칸" in md
     assert "https://github.com/x/y" in md and "repo_facts.py" in md
-    assert "실현 가능성: 숫자" in md            # 못 본 것 — 항목 이름과 근거 종류를 사람 말로
+    assert "실현 가능성 — 숫자" in md            # 못 본 것 — 항목 이름과 근거 종류를 사람 말로
     assert "사용자: 실증 안 함" in md             # 없다고 확인된 것
     assert "근거 장부 없음" not in md
 

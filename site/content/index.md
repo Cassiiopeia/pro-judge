@@ -2,11 +2,11 @@
 layout: home
 
 hero:
-  name: pro-judge
+  name: PRO-Judge
   text: 내기 전에, 그 대회 심사위원에게 먼저
   image:
     src: /assets/report-mobile.png
-    alt: pro-judge 채점 보고서 모바일 화면
+    alt: PRO-Judge 채점 보고서 모바일 화면
   tagline: 공고와 심사기준을 주면 에이전트가 심사위원이 되어 내 자료를 채점하고, 어디를 고치면 몇 점이 오르는지 순서대로 알려 준다.
   actions:
     - theme: brand
@@ -38,9 +38,17 @@ features:
 
 ## 이런 보고서가 나온다
 
-![채점 보고서 — 총점, 항목별 막대, 고칠 것 순위](/assets/report-desktop.png)
+<video src="/assets/report-tour.mp4" autoplay muted loop playsinline controls poster="/assets/report-desktop.png" style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
 
-이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다. <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-0957_score/report.html" target="_blank">전체 보고서 열기 →</a>
+이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다. 첫 구현 시점 24.2점, 첫 보고서가 짚은 것을 고친 v0.4.3에서 54.3점.
+<a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1850_score/report.html" target="_blank">보고서 열기 →</a> · <a href="/pro-judge/examples/공개SW-개발자대회/index.html" target="_blank">대시보드 →</a>
+
+## 대화로 쓴다
+
+<video src="/assets/conversation-demo.mp4" controls muted playsinline poster="/assets/conversation-demo.png" style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
+
+Claude Code에서 실제로 주고받은 2분이다(편집 없음). 지난 채점 결과를 요약하고, 가장 약한 항목(기능테스트)으로 질의응답을 연습한다.
+심사위원은 새 숫자를 대면 판정을 올리되, 자료의 테스트 함수 수(147)와 답한 통과 수(160)처럼 숫자가 다르면 꼬리 질문으로 확인한다.
 
 ## 설치는 한 줄
 

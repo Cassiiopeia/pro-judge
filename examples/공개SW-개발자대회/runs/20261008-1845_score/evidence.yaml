@@ -1,0 +1,64 @@
+scope: target
+subject: "pro-judge 저장소 — 첫 구현 머지 시점 (커밋 34f4e42)"
+sources:
+  - id: s1
+    kind: repo
+    ref: "https://github.com/Cassiiopeia/pro-judge/tree/34f4e42"
+    how: "repo_facts.py — 커밋·작성자·라이선스·테스트·CI, README 전문"
+    trust: self
+    status: ok
+    note: "웹 검색은 하지 않음 — 공개 전 시점이라 외부 자료가 없다"
+  - id: s2
+    kind: file
+    ref: "skills/pro-judge-score/SKILL.md, shared/scripts/aggregate.py"
+    how: "파일 원문을 target/에 복사"
+    trust: self
+    status: ok
+  - id: s3
+    kind: user
+    ref: "팀 확인"
+    how: "발표자료·시연 영상·배포 주소를 물음"
+    trust: user
+    status: ok
+evidence:
+  - item: "*"
+    type: numbers
+    source: s1
+    text: "전체 커밋 16개, 작성자 1명, 모두 2026-10-08"
+  - item: code-structure
+    type: observation
+    source: s1
+    text: "shared/ 22개 파일(스크립트), skills/ 5개 skill, tests/ 20개 파일로 나뉨"
+  - item: code-completeness
+    type: numbers
+    source: s1
+    text: "테스트 함수 108개, CI 워크플로우 없음"
+  - item: doc-specificity
+    type: quote
+    source: s2
+    text: "score SKILL.md가 대상 받기 → 비용 확인 → 런 폴더 → 페르소나 독립 실행 → 합산 → 보고서 순서를 적음"
+  - item: project-level
+    type: observation
+    source: s2
+    text: "합산 스크립트가 인용 대조·상한·중앙값·고칠 것 순위를 계산"
+  - item: oss-usage
+    type: observation
+    source: s1
+    text: "LICENSE 파일 없음, 의존성 PyYAML"
+absent:
+  - item: presentation
+    type: demo
+    source: s3
+    text: "사용자: 발표자료(PPT·PDF) 없음"
+  - item: demo
+    type: demo
+    source: s3
+    text: "사용자: 시연 영상·배포 주소 없음"
+  - item: community-potential
+    type: proper-nouns
+    source: s1
+    text: "CONTRIBUTING·이슈 템플릿·외부 기여자 없음"
+  - item: originality
+    type: proper-nouns
+    source: s1
+    text: "README에 비슷한 도구 이름을 댄 비교 없음"

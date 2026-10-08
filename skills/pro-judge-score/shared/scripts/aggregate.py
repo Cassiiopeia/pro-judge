@@ -251,9 +251,10 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
         high = sum(earned_of(i["_item"], INFERRED_MARGIN) if i["inferred_dependent"] else i["earned"] for i in items_out)
         total_range = [_r(round(low * multiplier, 1)), _r(round(high * multiplier, 1))]
 
-    models = {v["model"] for v in valid.values() if v["model"]}
+    # 모델 수는 그 항목을 실제로 채점한 심사위원 기준 — 1명만 채점한 항목이 "공통"이 되지 않게
     consensus = [i["id"] for i in items_out
-                 if len(models) >= 2 and all(s <= CONSENSUS_MAX_SCORE for s in i["by_persona"].values())]
+                 if len({valid[p]["model"] for p in i["by_persona"] if valid[p]["model"]}) >= 2
+                 and all(s <= CONSENSUS_MAX_SCORE for s in i["by_persona"].values())]
 
     # "못 받은 점수"가 아니라 "다음 앵커까지 올렸을 때 오르는 점수"로 고른다 — 앵커 문장이 곧 할 일이다
     candidates = []
@@ -269,8 +270,16 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
                            "gain": _r(round((goal - level) / 10 * i["points_total"] * multiplier, 1)),
                            "level": _r(level), "next_anchor": goal,
                            "next_anchor_text": str(anchors.get(str(goal), "")).strip(),
+                           # 순위는 다음 앵커 기준 그대로 두고, 만점까지 남은 점수를 함께 낸다
+                           "max_gain": _r(round((i["points_total"] - i["earned"]) * multiplier, 1)),
                            "caps": i["caps"], "unlock_hints": i["unlock_hints"]})
     fix_priority = sorted(candidates, key=lambda f: f["gain"], reverse=True)[:5]
+    # 다음 앵커가 가까운 항목은 순위에서 밀리지만 손실은 클 수 있다 — 가장 큰 구멍은 따로 보여 준다
+    losses = sorted(({"item": i["id"], "name": i["name"], "caps": i["caps"],
+                      "lost": _r(round((i["points_total"] - i["earned"]) * multiplier, 1))}
+                     for i in items_out if i["points_total"] - i["earned"] > 1e-9),
+                    key=lambda x: x["lost"], reverse=True)[:3]
+    losses = [{"item": x["item"], "name": x["name"], "lost": x["lost"], "caps": x["caps"]} for x in losses]
 
     for i in items_out:
         del i["_item"]
@@ -296,6 +305,7 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
         "calibration": calibration,
         "consensus_gaps": consensus,
         "fix_priority": fix_priority,
+        "losses": losses,
         "personas": [{"name": p, "groups": persona_groups[p], "model": v["model"],
                       "independent": v["independent"], "summary": v["runs"][-1]["summary"]}
                      for p, v in valid.items()],

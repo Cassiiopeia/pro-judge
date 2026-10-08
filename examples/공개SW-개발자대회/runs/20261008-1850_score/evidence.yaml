@@ -1,0 +1,77 @@
+scope: target
+subject: "pro-judge 저장소 — v0.4.3 (커밋 8cee7eb)"
+sources:
+  - id: s1
+    kind: repo
+    ref: "https://github.com/Cassiiopeia/pro-judge/tree/v0.4.3"
+    how: "repo_facts.py — 커밋·작성자·라이선스·테스트·CI, README·CONTRIBUTING·CODE_OF_CONDUCT 전문"
+    trust: self
+    status: ok
+  - id: s2
+    kind: file
+    ref: "SKILL.md 2개, aggregate.py, SECURITY.md, 문서 사이트 원본 4쪽"
+    how: "파일 원문을 target/에 복사"
+    trust: self
+    status: ok
+  - id: s3
+    kind: url
+    ref: "https://cassiiopeia.github.io/pro-judge/"
+    how: "브라우저로 열어 메뉴와 '실제 보고서 보기'를 눌러 봄"
+    trust: self
+    status: ok
+  - id: s4
+    kind: user
+    ref: "팀 확인"
+    how: "발표자료·시연 영상·외부 사용자를 물음"
+    trust: user
+    status: ok
+evidence:
+  - item: "*"
+    type: numbers
+    source: s1
+    text: "전체 커밋 73개(사람 50, 자동 23), 파일 308개, 모두 2026-10-08"
+  - item: code-structure
+    type: observation
+    source: s1
+    text: "shared/ 원본을 skills/*/shared/로 복사하고 테스트가 같은지 검사"
+  - item: code-completeness
+    type: numbers
+    source: s1
+    text: "테스트 함수 147개, CI 워크플로우 5개"
+  - item: doc-specificity
+    type: quote
+    source: s2
+    text: "문서 사이트에 작동 방식·검증 결과·비교 페이지가 있음"
+  - item: project-level
+    type: numbers
+    source: s2
+    text: "2025 오픈소스 개발자대회 수상팀이 미수상팀보다 높게 나온 쌍 29/36, 한 줄 프롬프트 26/36"
+  - item: oss-usage
+    type: proper-nouns
+    source: s1
+    text: "LICENSE Apache-2.0, NOTICE, PyMuPDF(AGPL-3.0) 미포함 고지"
+  - item: originality
+    type: proper-nouns
+    source: s2
+    text: "promptfoo llm-rubric, DeepEval G-Eval과 비교한 페이지"
+  - item: community-potential
+    type: observation
+    source: s1
+    text: "CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, 사용자 이슈 양식 3개, Discussions"
+  - item: demo
+    type: observation
+    source: s3
+    text: "문서 사이트에서 예제 채점 보고서 HTML이 열리고 README에 보고서 훑기 GIF가 있음"
+absent:
+  - item: presentation
+    type: demo
+    source: s4
+    text: "사용자: 발표자료(PPT·PDF) 없음"
+  - item: demo
+    type: demo
+    source: s4
+    text: "사용자: 3분 시연 영상 없음"
+  - item: community-potential
+    type: numbers
+    source: s4
+    text: "사용자: 외부 기여자·외부 이슈 0건"
