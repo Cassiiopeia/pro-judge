@@ -34,6 +34,16 @@ Claude Code 플러그인(대회가 등록된 레포에서 길잡이 자동 로�
 /plugin install pro-judge@pro-judge
 ```
 
+## 업데이트
+
+```bash
+npx skills update                                  # 바뀐 skill만 다시 받는다
+npx skills add Cassiiopeia/pro-judge#v0.1.0        # 특정 릴리스로 고정
+```
+
+Claude Code 플러그인은 `/plugin marketplace update pro-judge`로 갱신한다.
+릴리스마다 `v<버전>` 태그와 [CHANGELOG](CHANGELOG.md)가 남는다. 버전은 `version.yml`이 기준이다.
+
 ## 사용
 
 ```
@@ -53,3 +63,10 @@ python3 tools/sync_shared.py   # shared/ 를 고친 뒤 각 skill로 복사
 ```
 
 `skills/*/shared/`는 생성물이다. 직접 고치지 말고 `shared/`를 고친다.
+
+---
+
+<!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
+## 최신 버전 : v0.1.0
+
+[전체 버전 기록 보기](CHANGELOG.md)

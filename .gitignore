@@ -9,3 +9,9 @@ node_modules/
 
 # superpowers 실행 기록(로컬 전용)
 /.superpowers/
+
+# ====================================================================
+# projectops: Auto-added entries
+# ====================================================================
+/.idea
+/.claude/settings.local.json
