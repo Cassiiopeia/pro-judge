@@ -41,7 +41,7 @@ def test_flags_in_report(result):
 def test_html_self_contained(result):
     _, html = render(result)
     assert html.startswith("<!doctype html>")
-    assert "<svg" in html and "<style>" in html
+    assert 'class="bars"' in html and "<style>" in html
     assert not re.search(r'(src|href)="https?://', html)
     assert "<script" not in html
 
@@ -62,6 +62,14 @@ def test_blocks_roundtrip():
     md = to_markdown(blocks)
     assert "- (없음)" in md and "5 / 10" in md and "[r](runs/x/report.html)" in md
     assert 'href="runs/x/report.html"' in to_html(blocks, "T")
+
+
+def test_bars_do_not_shrink_on_phone():
+    # SVG viewBox는 폭 390px에서 통째로 줄어 글자가 6px이 된다 — 글자 크기가 고정된 HTML 행이어야 한다
+    html = to_html([{"type": "bars", "rows": [{"label": "실현 <가능성>", "value": 32, "max": 55}]}], "T")
+    assert "<svg" not in html
+    assert 'class="bar-row"' in html and "실현 &lt;가능성&gt;" in html
+    assert "width:58.2%" in html and "32 / 55" in html
 
 
 def test_cli(tmp_path, result):

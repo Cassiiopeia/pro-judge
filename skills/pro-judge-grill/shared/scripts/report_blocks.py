@@ -60,22 +60,21 @@ CSS = """
 main{max-width:920px;margin:0 auto;padding:24px 16px 64px}h1{font-size:24px;margin:0 0 8px}h2{font-size:18px;margin:32px 0 8px;padding-top:8px;border-top:1px solid var(--line)}
 p{margin:8px 0;white-space:pre-wrap}.callout{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 14px;margin:8px 0}
 .table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-th{color:var(--muted);font-weight:600}svg{width:100%;height:auto}svg text{fill:var(--fg);font-size:13px}.track{fill:var(--track)}.bar{fill:var(--bar)}a{color:var(--bar)}
+th{color:var(--muted);font-weight:600}a{color:var(--bar)}
+.bars{margin:8px 0}.bar-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.track{background:var(--track);border-radius:4px;height:14px}.fill{background:var(--bar);border-radius:4px;height:100%}.bar-value{color:var(--muted);white-space:nowrap}
 """
 
 
-def _bars_svg(rows: list) -> str:
-    row_h, label_w, bar_w, width = 30, 220, 440, 760
-    height = row_h * len(rows) + 8
-    parts = [f'<svg viewBox="0 0 {width} {height}" role="img">']
-    for n, r in enumerate(rows):
-        y = n * row_h + 4
-        ratio = (r["value"] / r["max"]) if r["max"] else 0
-        parts.append(f'<text x="0" y="{y + 18}">{escape(str(r["label"])[:40])}</text>')
-        parts.append(f'<rect class="track" x="{label_w}" y="{y + 6}" width="{bar_w}" height="16" rx="4"/>')
-        parts.append(f'<rect class="bar" x="{label_w}" y="{y + 6}" width="{bar_w * max(0, min(1, ratio)):.1f}" height="16" rx="4"/>')
-        parts.append(f'<text x="{label_w + bar_w + 10}" y="{y + 18}">{r["value"]:g} / {r["max"]:g}</text>')
-    parts.append("</svg>")
+def _bars_html(rows: list) -> str:
+    # SVG viewBox는 폰 폭에서 통째로 줄어 글자가 읽히지 않는다 — 글자 크기가 고정된 grid 행으로 그린다
+    parts = ['<div class="bars" role="img">']
+    for r in rows:
+        ratio = max(0.0, min(1.0, (r["value"] / r["max"]) if r["max"] else 0.0))
+        parts.append(f'<div class="bar-row"><span class="bar-label">{escape(str(r["label"]))}</span>'
+                     f'<div class="track"><div class="fill" style="width:{ratio * 100:.1f}%"></div></div>'
+                     f'<span class="bar-value">{r["value"]:g} / {r["max"]:g}</span></div>')
+    parts.append("</div>")
     return "".join(parts)
 
 
@@ -100,7 +99,7 @@ def to_html(blocks: list, title: str) -> str:
             body.append(f'<div class="table-wrap"><table><thead><tr>{head}</tr></thead><tbody>{rows or ""}</tbody></table></div>'
                         + ("" if b["rows"] else "<p>(없음)</p>"))
         elif t == "bars":
-            body.append(_bars_svg(b["rows"]))
+            body.append(_bars_html(b["rows"]))
         else:
             raise ValueError(f"모르는 블록 {t}")
     return ("<!doctype html>\n<html lang=\"ko\"><head><meta charset=\"utf-8\">"
