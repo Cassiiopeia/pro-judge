@@ -1,14 +1,34 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T03:16:43Z",
-    "currentVersion": "0.2.2",
+    "lastUpdated": "2026-10-08T04:23:14Z",
+    "currentVersion": "0.2.3",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 4
+    "totalReleases": 5
   },
   "releases": [
+    {
+      "version": "0.2.3",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 21,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **문서**\n  * 실제 오픈소스 대회 수상작으로 다시 검증한 결과를 공개했습니다\n  * 이 프로젝트 자체를 같은 기준으로 채점한 점수를 실었습니다",
+      "parsed_changes": {
+        "문서": {
+          "title": "문서",
+          "items": [
+            "실제 오픈소스 대회 수상작으로 다시 검증한 결과를 공개했습니다",
+            "이 프로젝트 자체를 같은 기준으로 채점한 점수를 실었습니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.2.2",
       "project_type": "basic",
