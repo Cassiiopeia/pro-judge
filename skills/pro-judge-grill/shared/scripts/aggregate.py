@@ -30,6 +30,9 @@ INFERRED_RANGE_SHARE = 0.3   # 추정 규칙에 기대는 배점이 이 비율 �
 ANCHOR_LEVELS = (5, 10)
 INFERRED_MARGIN = 1          # 추정 규칙이 걸린 항목은 ±1점 흔들릴 수 있다고 본다
 SKIP_FILES = {"result.json", "ideas.json"}
+# 인용 대조에 쓰지 않는 원본 형식. 모르는 확장자는 지금처럼 읽어 보고 디코딩이 안 되면 건너뛴다
+BINARY_SUFFIXES = {".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".heic", ".pptx", ".ppt",
+                   ".docx", ".doc", ".hwp", ".key", ".zip", ".mp4", ".mov"}
 
 
 class AggregateError(Exception):
@@ -353,7 +356,8 @@ def _read_target(run_dir: Path):
         return None
     texts = []
     for f in sorted(target.rglob("*")):
-        if f.is_file():
+        # 원본 PDF·이미지는 통째로 읽은 뒤에야 디코딩 오류로 버려진다 — 확장자로 먼저 거른다
+        if f.is_file() and f.suffix.lower() not in BINARY_SUFFIXES:
             try:
                 texts.append(f.read_text(encoding="utf-8"))
             except UnicodeDecodeError:

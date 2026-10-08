@@ -24,6 +24,7 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -33,6 +34,8 @@ from _common import InputError, run_cli  # noqa: E402
 TEXT_MIN_CHARS = 20
 RENDER_DPI = 150
 PLAIN_SUFFIXES = {".md", ".txt", ".markdown", ".csv", ".json", ".yaml", ".yml", ".html"}
+# 동시에 돌릴 OCR 프로세스 수 — 코어 수를 넘기면 서로 기다리기만 한다
+OCR_WORKERS = max(1, min(4, os.cpu_count() or 1))
 
 
 def parse_pages(spec, total: int) -> list:
@@ -82,6 +85,9 @@ class PyMuPDFBackend:
 class PopplerBackend:
     name = "poppler"
 
+    def __init__(self):
+        self._pages = {}  # path → 쪽별 글자 목록. 문서 전체를 한 번 뽑지 못했으면 None
+
     def page_count(self, path):
         out = subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True).stdout
         m = re.search(r"^Pages:\s+(\d+)", out, re.M)
@@ -89,7 +95,21 @@ class PopplerBackend:
             raise InputError(f"PDF를 열 수 없음: {path}")
         return int(m.group(1))
 
+    def _all_pages(self, path):
+        # 쪽마다 pdftotext를 띄우면 100쪽에 1.5초가 든다(실측) — 한 번에 뽑아 쪽 구분 문자(\f)로 나눈다
+        if path not in self._pages:
+            r = subprocess.run(["pdftotext", "-layout", str(path), "-"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            parts = r.stdout.split("\f")
+            # 쪽마다 끝에 \f가 붙어 조각이 쪽 수+1개다. 수가 안 맞으면(깨진 쪽 등) 쪽별 호출로 되돌아간다
+            ok = r.returncode == 0 and len(parts) - 1 == self.page_count(path)
+            self._pages[path] = [p + "\f" for p in parts[:-1]] if ok else None
+        return self._pages[path]
+
     def page_text(self, path, n):
+        pages = self._all_pages(path)
+        if pages is not None:
+            return pages[n - 1]
         return subprocess.run(["pdftotext", "-f", str(n), "-l", str(n), "-layout", str(path), "-"],
                               capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
 
@@ -105,12 +125,19 @@ class PypdfBackend:
 
     def __init__(self, mod):
         self.mod = mod
+        self._readers = {}
+
+    def _reader(self, path):
+        # 쪽마다 PdfReader를 새로 만들면 문서 전체를 쪽 수만큼 다시 파싱한다 — 한 번 연 것을 재사용
+        if path not in self._readers:
+            self._readers[path] = self.mod.PdfReader(str(path))
+        return self._readers[path]
 
     def page_count(self, path):
-        return len(self.mod.PdfReader(str(path)).pages)
+        return len(self._reader(path).pages)
 
     def page_text(self, path, n):
-        return self.mod.PdfReader(str(path)).pages[n - 1].extract_text() or ""
+        return self._reader(path).pages[n - 1].extract_text() or ""
 
     def render(self, path, n, out):
         return False  # pypdf는 쪽을 그림으로 그리지 못한다
@@ -234,13 +261,23 @@ def windows_ocr_command(image: Path, script: Path = Path("pro-judge-ocr.ps1")) -
     return ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), str(image)]
 
 
+def _ocr_each(command, images, env=None) -> dict:
+    """이미지마다 OCR 프로세스를 띄우되 동시에 돌린다. 외부 프로세스라 GIL에 막히지 않는다."""
+    def one(img):
+        return subprocess.run(command(img), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", env=env).stdout
+    if len(images) <= 1:
+        return {img: one(img) for img in images}
+    with ThreadPoolExecutor(max_workers=min(len(images), OCR_WORKERS)) as pool:
+        return dict(zip(images, pool.map(one, images)))
+
+
 def windows_ocr():
     script = _windows_script()
 
     def run(images):
-        return {img: subprocess.run(windows_ocr_command(img, script), capture_output=True,
-                                    text=True, encoding="utf-8", errors="replace").stdout
-                for img in images}
+        # PowerShell 기동이 장당 수 초라 순서대로 돌리면 슬라이드 수십 장에서 분 단위가 된다
+        return _ocr_each(lambda img: windows_ocr_command(img, script), images)
     run.name = "windows"
     return run
 
@@ -248,11 +285,11 @@ def windows_ocr():
 def tesseract_ocr():
     langs = subprocess.run(["tesseract", "--list-langs"], capture_output=True, text=True).stdout.split()
     lang = "+".join(l for l in ("kor", "eng") if l in langs) or "eng"
+    # 여러 장을 동시에 돌리므로 tesseract 내부 스레드는 1개로 묶는다 — 안 묶으면 코어를 서로 뺏어 더 느려진다
+    env = {**os.environ, "OMP_THREAD_LIMIT": "1"}
 
     def run(images):
-        return {img: subprocess.run(["tesseract", str(img), "-", "-l", lang], capture_output=True,
-                                    text=True, encoding="utf-8", errors="replace").stdout
-                for img in images}
+        return _ocr_each(lambda img: ["tesseract", str(img), "-", "-l", lang], images, env)
     run.name = f"tesseract({lang})"
     return run
 
