@@ -6,11 +6,12 @@ pro-judge에 이슈나 PR을 보내 주셔서 고맙습니다. 아래만 지키�
 
 ```bash
 python3 -m pip install pyyaml pytest
-python3 -m pip install pymupdf      # 선택: PDF 추출 테스트를 실제 파일로 돌려 볼 때
+python3 -m pip install pymupdf      # 선택: PDF 추출을 실제 파일로 돌려 볼 때 (AGPL-3.0 — pro-judge에 포함하지 않는다)
 python3 -m pytest                    # 모두 통과해야 PR을 받는다
 ```
 
 Python 3.9 이상. 새 외부 의존성은 넣지 않는다 — PyYAML 하나만 필수다. PDF·OCR 도구는 있으면 쓰고 없으면 대체 경로로 간다.
+PyMuPDF(AGPL-3.0)·poppler(GPL)를 skill 폴더에 넣거나 함께 배포하지 않는다 — 사용자가 고른 도구를 설치해 쓰게 둔다.
 
 ## 흐름
 
@@ -63,6 +64,16 @@ python3 shared/scripts/render_report.py $X/runs/20261008-0957_score
 python3 shared/scripts/render_report.py $X/runs/20261008-1000_grill
 python3 shared/scripts/render_dashboard.py $X
 ```
+
+### 문서 사이트를 고칠 때
+
+사이트(https://cassiiopeia.github.io/pro-judge/)의 원본은 `site/content/`의 md다. main에 반영되면 자동으로 배포된다.
+
+```bash
+cd site && npm ci && npm run docs:dev     # http://localhost:5173/pro-judge/
+```
+
+예시 보고서(`examples/`)와 캡처(`assets/`)는 빌드할 때 사이트로 복사된다. 사본(`site/content/public/`)을 고치지 않는다.
 
 ## AI 기여 정책
 

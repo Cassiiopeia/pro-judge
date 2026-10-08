@@ -1,0 +1,11 @@
+# 보안 정책
+
+## 신고
+
+보안 문제는 공개 이슈에 쓰지 않고 GitHub의 [비공개 취약점 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new)로 알려 준다.
+
+예: 채점 대상 파일(PDF·저장소·URL)을 읽는 과정에서 임의 명령이 실행되는 경우, 근거 장부·보고서 생성 중 다른 경로의 파일을 덮어쓰는 경우.
+
+## 지원 버전
+
+최신 릴리스만 고친다. [Releases](https://github.com/Cassiiopeia/pro-judge/releases)
