@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
-import { cpSync, existsSync } from 'node:fs'
+import { cpSync, existsSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 // 문서 원본은 site/content/ 하나뿐이다. 저장소의 docs/ 는 로컬 산출물(git 제외)이라 쓰지 않는다.
@@ -10,6 +10,8 @@ const REPO = resolve(__dirname, '../..')
 const PUBLIC = resolve(__dirname, '../content/public')
 for (const dir of ['examples', 'assets']) {
   const from = join(REPO, dir)
+  // 복사본을 먼저 비운다 — 원본에서 지운 예제 회차가 public/ 에 남아 배포되지 않게
+  rmSync(join(PUBLIC, dir), { recursive: true, force: true })
   if (existsSync(from)) cpSync(from, join(PUBLIC, dir), { recursive: true })
 }
 const GITHUB = 'https://github.com/Cassiiopeia/pro-judge'

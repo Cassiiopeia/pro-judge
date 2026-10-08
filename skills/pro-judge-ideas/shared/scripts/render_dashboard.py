@@ -65,10 +65,13 @@ def build(contest_dir: Path):
         sub = [f"대상 {last.get('target') or '-'}"]
         if len(scored) > 1:
             sub.append(f"직전 회차 대비 {last['total'] - scored[-2][1]['total']:+.1f}")
-            sub.append(f"첫 회차 {scored[0][1]['total']:.1f}에서 {last['total'] - scored[0][1]['total']:+.1f}")
+            if len(scored) > 2:  # 회차가 둘이면 직전 = 첫 회차라 같은 말을 두 번 한다
+                sub.append(f"첫 회차 {scored[0][1]['total']:.1f}에서 {last['total'] - scored[0][1]['total']:+.1f}")
+        sub.append("진단 지표다. 실제 대회 점수의 예측이 아니다.")
         top = (last.get("fix_priority") or [None])[0]
         dash.append({"type": "hero", "score": last["total"], "max": 100, "caption": "최근 채점 총점", "sub": sub,
-                     "top_fix": {"name": top["name"], "gain": top["gain"], "anchor": top.get("next_anchor_text") or ""} if top else None})
+                     "top_fix": {"name": top["name"], "gain": top["gain"], "anchor": top.get("next_anchor_text") or ""} if top else None,
+                     "loss": (last.get("losses") or [None])[0]})
     dash += [{"type": "h2", "text": "총점 추이"},
              ({"type": "bars", "rows": [{"label": f"{p.name} · {r.get('target') or '-'}", "value": r["total"], "max": 100}
                                         for p, r in scored]}

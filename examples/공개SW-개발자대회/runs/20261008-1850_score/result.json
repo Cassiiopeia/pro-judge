@@ -311,7 +311,6 @@
   "quotes_verified": true,
   "calibration": false,
   "consensus_gaps": [
-    "function-test",
     "presentation",
     "community-potential",
     "demo"
@@ -324,6 +323,7 @@
       "level": 7.33,
       "next_anchor": 10,
       "next_anchor_text": "OSI 라이선스 파일, 설치 명령, 의존성 라이선스 목록이 모두 레포에 있다",
+      "max_gain": 2.7,
       "caps": [],
       "unlock_hints": [
         "Apache-2.0 LICENSE, NOTICE, 설치 명령은 있다. 하지만 필수 의존성 PyYAML을 포함해 의존성 라이선스를 한 목록으로 정리한 문서는 없다. 그런 목록이 레포에 있으면 9점 이상이다.",
@@ -337,6 +337,7 @@
       "level": 8.33,
       "next_anchor": 10,
       "next_anchor_text": "기존 도구 2개 이상을 이름으로 비교하고 차별 기능이 코드에서 확인된다",
+      "max_gain": 2.5,
       "caps": [],
       "unlock_hints": [
         "promptfoo, DeepEval 2개를 이름으로 비교하고 인용 대조·상한 강제가 aggregate.py에 구현돼 있어 8점. 비교 표의 차별 항목마다 해당 코드 위치를 적으면 10점입니다."
@@ -349,6 +350,7 @@
       "level": 2.67,
       "next_anchor": 5,
       "next_anchor_text": "발표자료는 있으나 문제 규모나 결과에 숫자가 없다",
+      "max_gain": 7.3,
       "caps": [
         "no-deck"
       ],
@@ -365,6 +367,7 @@
       "level": 5.66,
       "next_anchor": 10,
       "next_anchor_text": "README 절차대로 실행되고 테스트 N개 통과가 확인되며 시연 영상이 있다",
+      "max_gain": 2.2,
       "caps": [],
       "unlock_hints": [
         "README에 설치 명령은 있다. 그러나 테스트가 N개 통과했다는 결과 수치가 문서에 없고 3분 시연 영상도 없다. 그 둘이 있으면 8점 이상이다.",
@@ -378,10 +381,37 @@
       "level": 6.0,
       "next_anchor": 10,
       "next_anchor_text": "모듈마다 책임이 한 문장으로 설명되고 복사된 코드가 없으며 에러 처리 방식이 한 가지다",
+      "max_gain": 2.0,
       "caps": [],
       "unlock_hints": [
         "shared/와 skills/*/shared/ 사본이 같은 코드를 2곳에 둔다. 테스트가 동기화를 검사하긴 하지만 복사본이 있는 건 사실이다. 사본 없이 단일 원본으로 쓰는 구조가 되거나 모듈별 책임 문서가 있으면 7점 이상이다.",
         "skills/*/shared/ 사본을 없애 같은 코드가 2곳에 복사돼 있지 않으면 7점 이상. 현재는 사본 커밋 방식이라 5점입니다."
+      ]
+    }
+  ],
+  "losses": [
+    {
+      "item": "demo",
+      "name": "작품 데모",
+      "lost": 11.3,
+      "caps": [
+        "no-demo-material"
+      ]
+    },
+    {
+      "item": "community-potential",
+      "name": "커뮤니티로 발전가능성",
+      "lost": 10.7,
+      "caps": [
+        "last-minute-commits"
+      ]
+    },
+    {
+      "item": "presentation",
+      "name": "작품 발표",
+      "lost": 7.3,
+      "caps": [
+        "no-deck"
       ]
     }
   ],
@@ -472,7 +502,7 @@
     "delta": 30.1
   },
   "narrative": {
-    "overall": "54.3점, 첫 구현 시점보다 30.1점 올랐다. 오른 점수의 대부분은 LICENSE·CONTRIBUTING·행동 강령(공개SW 활용성 3.0→7.3, 커뮤니티 1.3→9.3)과 promptfoo·DeepEval 비교 페이지(독창성 3.5→12.5)에서 나왔다. 그래도 가장 큰 구멍은 그대로다: 3분 시연 영상과 발표자료가 없어 데모·발표 두 항목(30점)에서 11.3점만 얻었고, 커밋 73개가 하루에 몰려 있고 외부 기여자가 0명이라 커뮤니티 항목은 last-minute-commits 상한에 걸렸다. 다음은 시연 영상과 발표자료, 그리고 대회 뒤 유지 계획이다.",
+    "overall": "54.3점, 첫 구현 시점보다 30.1점 올랐다. 오른 점수의 대부분은 LICENSE·CONTRIBUTING·행동 강령(공개SW 활용성 3.0→7.3, 커뮤니티 1.3→9.3)과 promptfoo·DeepEval 비교 페이지(독창성 3.5→12.5)에서 나왔다. 가장 큰 손실은 여전히 데모·발표다: 시연 영상과 발표자료가 없어 두 항목 30점 중 11.3점(+7.4)에 머물렀다. 커뮤니티는 20점 중 9.3점이다 — 커밋 73개가 하루에 몰려 있고 외부 기여자가 0명이며, 대회 뒤 유지 계획이 없다. 기능테스트는 2점에서 1점으로 내려갔는데, 검증 담당 1명만 채점하는 항목이라 회차마다 흔들릴 수 있고 두 회차 모두 테스트 통과 기록이 자료에 없었다. 다음은 시연 영상과 발표자료, 유지 계획이다.",
     "personas": {}
   },
   "evidence": {

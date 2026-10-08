@@ -87,8 +87,11 @@ def _notices(r: dict) -> list:
 
 
 def _fix_view(f: dict) -> dict:
-    return {"name": f["name"], "gain": f["gain"],
-            "now": f"지금 {f.get('level', 0):.1f}점 → {f.get('next_anchor', '-')}점 기준",
+    # level·앵커는 10점 척도, gain은 총점 기준이다 — 막대(배점 기준)와 섞여 보이지 않게 척도를 밝힌다
+    now = f"10점 척도 {f.get('level', 0):.1f} → {f.get('next_anchor', '-')}"
+    if f.get("max_gain") is not None:
+        now += f" · 만점까지 최대 +{f['max_gain']:.1f}점"
+    return {"name": f["name"], "gain": f["gain"], "now": now,
             "anchor": f.get("next_anchor_text") or "", "caps": ", ".join(f["caps"]),
             "hint": (f["unlock_hints"] or [""])[0]}
 
@@ -97,7 +100,8 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
     p, g = r["participation"], r["gate"]
     meta = [_when(r["created_at"]), f"회차 {r['run'] or '-'}", f"대상 {r['target'] or '-'}", f"심사위원 {p['succeeded']}명",
             "인용 원문 대조함" if r.get("quotes_verified") else "인용 원문 대조 안 함"]
-    sub = []
+    # 접힌 안내만으로는 놓친다 — "예측 아님"은 총점 옆에 늘 보이게 둔다
+    sub = ["진단 지표다. 실제 대회 점수의 예측이 아니다."]
     if r["total_range"]:
         sub.append(f"추정 규칙 민감도 {r['total_range'][0]:.1f} ~ {r['total_range'][1]:.1f} (추정 규칙 비중 {r['inferred_share']:.0%}, 신뢰구간 아님)")
     if r["previous"]:
@@ -109,7 +113,7 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
     b = [{"type": "h1", "text": f"{r['contest']} 채점 보고서"},
          {"type": "meta", "items": meta},
          {"type": "hero", "score": r["total"], "max": 100, "caption": "100점 만점 환산 총점", "sub": sub,
-          "top_fix": fixes[0] if fixes else None},
+          "top_fix": fixes[0] if fixes else None, "loss": (r.get("losses") or [None])[0]},
          {"type": "notice", "label": f"이 점수 읽는 법 · 확인할 것 {len(notices)}건", "items": notices}]
 
     nar = _narrative(r)
@@ -121,7 +125,8 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
 
     b += [{"type": "h2", "text": "고칠 것 Top 5"},
           {"type": "p", "muted": True,
-           "text": "다음 기준 문장(5점 또는 10점)까지 올렸을 때 오르는 총점 순서다. 그 문장이 자료에 생기게 만드는 것이 할 일이다."},
+           "text": "다음 기준 문장(10점 척도의 5점 또는 10점)까지 올렸을 때 바로 오르는 총점 순서다. 그 문장이 자료에 생기게 만드는 것이 할 일이다. "
+                   "다음 기준이 가까운 항목은 오르는 점수가 작게 나온다 — 손실이 큰 항목은 맨 위 '가장 큰 손실'을 함께 본다."},
           {"type": "fixes", "items": fixes}]
 
     b += _evidence_blocks(r.get("evidence"))
@@ -145,7 +150,7 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
 
     b += [{"type": "h2", "text": "심사위원별 총평"},
           {"type": "cards", "items": [{"title": _who(labels, p["name"]),
-                                       "sub": f"{', '.join(p['groups'])} · {p['model'] or '모델 미기록'}",
+                                       "sub": f"모델 {p['model'] or '미기록'}",
                                        "text": (nar.get("personas") or {}).get(p["name"]) or p["summary"] or "-"}
                                       for p in r["personas"]]}]
 
@@ -165,6 +170,18 @@ EVIDENCE_TYPE_LABEL = {"numbers": "숫자", "proper-nouns": "고유명사", "dem
                        "quote": "인용", "observation": "관찰", None: "-"}
 SOURCE_LABEL = {"file": "파일", "repo": "저장소", "url": "URL", "web": "웹 검색", "user": "사용자", "video": "영상"}
 TRUST_LABEL = {"official": "공식", "reported": "보도·제3자", "self": "팀 자료", "user": "사용자 진술"}
+STATUS_LABEL = {"ok": "확인함", "partial": "일부만", "failed": "못 봄"}
+
+
+def _gap_lines(gaps: list) -> list:
+    """같은 항목의 빈칸을 한 줄로 — "독창성: 인용", "독창성: 관찰"처럼 흩어지면 무엇이 없는지 안 읽힌다."""
+    grouped: dict = {}
+    for g in gaps:
+        grouped.setdefault(g["name"], [])
+        if g.get("type"):
+            grouped[g["name"]].append(EVIDENCE_TYPE_LABEL.get(g["type"], g["type"]))
+    return [f"{name} — {'·'.join(types)} 근거를 자료에서 찾지 못함" if types else f"{name} — 근거를 자료에서 찾지 못함"
+            for name, types in grouped.items()]
 
 
 def _evidence_blocks(ev) -> list:
@@ -176,10 +193,10 @@ def _evidence_blocks(ev) -> list:
     return [{"type": "h2", "text": "확인한 자료와 빈칸"},
             {"type": "table", "headers": ["출처", "어디서", "어떻게", "신뢰", "상태"],
              "rows": [[SOURCE_LABEL.get(s["kind"], s["kind"]), s["ref"], s.get("how") or "-",
-                       TRUST_LABEL.get(s["trust"], s["trust"]), s["status"] + (f" ({s['note']})" if s.get("note") else "")]
+                       TRUST_LABEL.get(s["trust"], s["trust"]), STATUS_LABEL.get(s["status"], s["status"]) + (f" ({s['note']})" if s.get("note") else "")]
                       for s in ev["sources"]]},
             {"type": "p", "text": "못 본 것 — 점수표가 요구하는 근거 중 자료에서 찾지 못한 것. 이 항목의 점수는 자료를 넣으면 달라질 수 있다."},
-            {"type": "list", "items": [label(g) for g in ev["gaps"]]},
+            {"type": "list", "items": _gap_lines(ev["gaps"])},
             {"type": "p", "text": "없다고 확인된 것"},
             {"type": "list", "items": [f"{label(a)} — {a['text']}" for a in ev["absent"]]}]
 
@@ -237,7 +254,8 @@ def _grill_blocks(r: dict, labels: dict | None = None) -> list:
     validate_grill(r)
     mode = "연습" if r["mode"] == "practice" else "질문지"
     b = [{"type": "h1", "text": f"{r['contest']} 질의응답 보고서"},
-         {"type": "meta", "items": [_when(r["created_at"]), f"{mode} 모드", f"질문 {len(r['questions'])}개"]}]
+         {"type": "meta", "items": [_when(r["created_at"]), f"{mode} 모드", f"질문 {len(r['questions'])}개"]
+                                   + ([f"기준 회차 {r['based_on']}"] if r.get("based_on") else [])}]
     items, weak = [], []
     for n, q in enumerate(r["questions"], 1):
         who, item = _who(labels, q["persona"]), _item(labels, q["item"])
@@ -263,7 +281,7 @@ def _grill_blocks(r: dict, labels: dict | None = None) -> list:
               {"type": "qa", "mode": "sheet", "items": items}]
     b += [{"type": "h2", "text": "자료 수정 제안"},
           {"type": "table", "headers": ["넣을 근거", "항목", "점수 변화"],
-           "rows": [[s["evidence"], _item(labels, s["item"]), f"{s['from_score']} → {s['to_score']}"] for s in r.get("suggestions") or []]},
+           "rows": [[s["evidence"], _item(labels, s["item"]), f"{s['from_score']} → {s['to_score']} (10점 척도)"] for s in r.get("suggestions") or []]},
           {"type": "h2", "text": "총평"},
           {"type": "p", "text": _narrative(r).get("overall") or "(총평 없음)"}]
     return b

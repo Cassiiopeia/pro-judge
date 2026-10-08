@@ -111,3 +111,46 @@ def test_overall_right_after_total_and_appendix_folded(result):
     assert re.search(r'<details class="fold"><summary>부록</summary>', html)
     assert re.search(r'<details class="fold"><summary>항목별 근거</summary>', html)
     assert "## 부록" in md and "## 항목별 근거" in md
+
+
+def test_hero_shows_biggest_loss_and_disclaimer(result):
+    # 순위 1번과 가장 큰 손실이 다를 수 있다 — 둘 다 첫 화면에, "예측 아님"은 접지 않고 늘 보이게
+    _, html = render(result)
+    hero = re.search(r'<section class="hero[^"]*">(.*?)</section>', html, re.S).group(1)
+    loss = result["losses"][0]
+    assert "가장 큰 손실" in hero and loss["name"] in hero and f"-{loss['lost']:.1f}" in hero
+    assert "실제 대회 점수의 예측이 아니다" in hero
+
+
+def test_fix_card_names_scale_and_max_gain(result):
+    _, html = render(result)
+    card = re.search(r'<div class="fix">(.*?)</div><span class="gain">', html, re.S).group(1)
+    f = result["fix_priority"][0]
+    assert "10점 척도" in card and f"최대 +{f['max_gain']:.1f}점" in card
+
+
+def test_accessibility_and_print(result):
+    _, html = render(result)
+    assert 'class="bars panel" role' not in html          # 막대 행 글이 화면낭독기에서 사라지지 않게
+    assert 'aria-label="100점 중 62.0점"' in html
+    assert "details::details-content" in html              # 인쇄할 때 접힌 안내·부록도 나온다
+
+
+def test_evidence_status_and_gaps_readable(contest_dir):
+    from evidence import summary
+    rubric = load_yaml(contest_dir / "rubric.yaml")
+    ledger = {"scope": "target", "subject": "s",
+              "sources": [{"id": "s1", "kind": "repo", "ref": "r", "how": "h", "trust": "self", "status": "ok"}],
+              "evidence": [], "absent": []}
+    r = aggregate(rubric, base_results(), run="x")
+    r["evidence"] = summary(ledger, rubric)
+    md, _ = render(r)
+    sec = md.split("## 확인한 자료와 빈칸")[1].split("\n## ")[0]
+    assert "| 확인함 |" in sec and "| ok |" not in sec
+    # 같은 항목의 빈칸은 한 줄로 묶어 무엇이 없는지 말한다
+    assert sum(1 for ln in sec.splitlines() if ln.startswith("- 실현 가능성")) == 1
+
+
+def test_grill_shows_base_run(contest_dir):
+    md, html = render({**GRILL, "based_on": "20261008-1405_score"})
+    assert "기준 회차 20261008-1405_score" in md

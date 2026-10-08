@@ -36,8 +36,8 @@ def _md_table(headers: list, rows: list) -> str:
 
 
 def _fix_md(n: int, f: dict) -> str:
-    parts = [f"{n}. **{_md_line(f['name'])}** +{f['gain']:g}점 ({_md_line(f['now'])})"]
-    for key, label in (("anchor", "다음 기준"), ("caps", "걸린 상한"), ("hint", "해제 조건")):
+    parts = [f"{n}. **{_md_line(f['name'])}** +{f['gain']:.1f}점 ({_md_line(f['now'])})"]
+    for key, label in (("anchor", "다음 기준"), ("caps", "심사위원이 적용한 상한"), ("hint", "해제 조건")):
         if f.get(key):
             parts.append(f"   - {label}: {_md_line(f[key])}")
     return "\n".join(parts)
@@ -76,7 +76,9 @@ def to_markdown(blocks: list) -> str:
             lines = [f"**{b['score']:.1f}** / {b['max']:g}"] + [_md_line(s) for s in b.get("sub") or []]
             if b.get("top_fix"):
                 f = b["top_fix"]
-                lines.append(f"가장 먼저 고칠 것: **{_md_line(f['name'])}** +{f['gain']:g}점")
+                lines.append(f"가장 먼저 고칠 것: **{_md_line(f['name'])}** +{f['gain']:.1f}점")
+            if b.get("loss"):
+                lines.append(f"가장 큰 손실: **{_md_line(b['loss']['name'])}** -{b['loss']['lost']:.1f}점")
             out.append("\n\n".join(lines))
         elif t == "list":
             out.append("\n".join(f"- {_md_line(x)}" for x in b["items"]) if b["items"] else "- (없음)")
@@ -110,9 +112,9 @@ def to_markdown(blocks: list) -> str:
 # 브랜드 색은 사이트와 같은 붉은 펜 색. 점수 구간 색은 색약을 고려해 명도 차이도 함께 둔다
 CSS = """
 :root{--bg:#f6f5f2;--card:#fff;--fg:#1d1d1f;--muted:#6b6b70;--line:#e6e3dd;--brand:#b4232a;--brand-soft:#fbeaea;
---low:#c8322b;--mid:#d9822b;--high:#2f8f5b;--track:#ece9e3;--warn:#8a4b08;--warn-bg:#fff6e8;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
+--low:#c8322b;--mid:#d9822b;--high:#2f8f5b;--up-bg:#e3f4ea;--up-fg:#1f6b42;--same-bg:#f1efe9;--down-bg:#fbe4e2;--down-fg:#a3261f;--track:#ece9e3;--warn:#8a4b08;--warn-bg:#fff6e8;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
 @media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1c1c1f;--fg:#ececee;--muted:#a0a0a8;--line:#2c2c31;--brand:#f2706a;--brand-soft:#3a1f1f;
---low:#f0675f;--mid:#f0a050;--high:#4fc283;--track:#2a2a2f;--warn:#ffc27a;--warn-bg:#2b2318;--shadow:none}}
+--low:#f0675f;--mid:#f0a050;--high:#4fc283;--up-bg:#173326;--up-fg:#7fd9a6;--same-bg:#2a2a2f;--down-bg:#3a1c1a;--down-fg:#ff9a92;--track:#2a2a2f;--warn:#ffc27a;--warn-bg:#2b2318;--shadow:none}}
 *{box-sizing:border-box}html{word-break:keep-all;overflow-wrap:break-word}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif}
 main{max-width:960px;margin:0 auto;padding:28px 16px 48px}
@@ -130,6 +132,7 @@ background:radial-gradient(closest-side,var(--card) 79%,transparent 80% 100%),co
 .ring-in{text-align:center;line-height:1.1}.hero-score{font-size:40px;font-weight:800;letter-spacing:-.02em}.hero-max{display:block;font-size:13px;color:var(--muted);margin-top:4px}
 .hero-caption{font-weight:700;margin:0 0 6px}.hero-sub{margin:0;padding:0;list-style:none;color:var(--muted);font-size:14px}
 .top-fix{margin-top:14px;border-radius:12px;background:var(--brand-soft);padding:12px 14px}
+.top-loss{margin-top:8px;font-size:14px}.top-loss .k{font-size:12px;font-weight:700;color:var(--muted);margin-right:4px}.top-loss .v{font-weight:700}.top-loss .lost{color:var(--low);font-weight:800}
 .top-fix .k{font-size:12px;font-weight:700;color:var(--brand)}.top-fix .v{font-weight:700}.gain{color:var(--brand);font-weight:800;white-space:nowrap}
 .notice{margin:14px 0 0;background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 16px;font-size:14px}
 .notice summary{cursor:pointer;font-weight:700}.notice ul{margin:8px 0 4px;padding-left:18px}.notice li{margin:4px 0}
@@ -149,7 +152,7 @@ background:radial-gradient(closest-side,var(--card) 79%,transparent 80% 100%),co
 .qa{display:grid;gap:10px}.q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:14px}
 .q.follow{margin-left:24px;border-style:dashed}.q .who{color:var(--muted);font-size:12px}.q .qt{font-weight:700;font-size:15px;margin:4px 0 8px}
 .q .ans{border-left:3px solid var(--line);padding:2px 0 2px 10px;margin:6px 0;white-space:pre-wrap}
-.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;margin-left:6px}.v-up{background:#e3f4ea;color:#1f6b42}.v-same{background:#f1efe9;color:#6b6b70}.v-down{background:#fbe4e2;color:#a3261f}
+.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;margin-left:6px}.v-up{background:var(--up-bg);color:var(--up-fg)}.v-same{background:var(--same-bg);color:var(--muted)}.v-down{background:var(--down-bg);color:var(--down-fg)}
 .table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
 table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
 tr:last-child td{border-bottom:0}th{color:var(--muted);font-weight:600;font-size:13px;white-space:nowrap}a{color:var(--brand)}
@@ -157,7 +160,7 @@ ul.plain{padding-left:20px}.fold{margin:28px 0 0}.fold>summary{cursor:pointer;fo
 @media (max-width:560px){h1{font-size:22px}.hero{grid-template-columns:1fr;justify-items:center;text-align:center;padding:20px}
 .hero-sub{text-align:center}.top-fix{text-align:left;width:100%}.bar-row{grid-template-columns:minmax(0,1fr) 5.5em;row-gap:4px}
 .bar-row .track{grid-column:1/-1;grid-row:2}.fix{grid-template-columns:2.2em minmax(0,1fr)}.fix .gain{grid-column:2}.q.follow{margin-left:12px}}
-@media print{body{background:#fff}.hero,.panel,.fix,.card,.q,.table-wrap{box-shadow:none;break-inside:avoid}.notice{display:block}details>*{display:block}
+@media print{body{background:#fff}.hero,.panel,.fix,.card,.q,.table-wrap{box-shadow:none;break-inside:avoid}details::details-content{content-visibility:visible;display:block}details>*{display:block}
 main{max-width:none;padding:0}h2{break-after:avoid}}
 """
 
@@ -166,7 +169,8 @@ def _bars_html(b: dict) -> str:
     # SVG viewBox는 폰 폭에서 통째로 줄어 글자가 읽히지 않는다 — 글자 크기가 고정된 grid 행으로 그린다
     rows = b["rows"]
     top = max((r["max"] for r in rows), default=0)
-    parts = ['<div class="bars panel" role="img">']
+    # role="img"는 안쪽 글을 화면낭독기에서 감춘다 — 막대 행의 글이 그대로 읽히게 둔다
+    parts = ['<div class="bars panel">']
     for r in rows:
         ratio = _ratio(r["value"], r["max"])
         # scale이면 트랙 길이를 배점에 비례시킨다 — 20점 항목의 2점과 5점 항목의 2점이 같아 보이지 않게
@@ -187,21 +191,28 @@ def _hero_html(b: dict) -> str:
     fix = ""
     if b.get("top_fix"):
         f = b["top_fix"]
-        fix = (f'<div class="top-fix"><div class="k">가장 먼저 고칠 것</div>'
-               f'<div><span class="v">{escape(str(f["name"]))}</span> <span class="gain">+{f["gain"]:g}점</span></div>'
+        fix = (f'<div class="top-fix"><div class="k">가장 먼저 고칠 것 — 다음 기준까지 바로 오르는 점수</div>'
+               f'<div><span class="v">{escape(str(f["name"]))}</span> <span class="gain">+{f["gain"]:.1f}점</span></div>'
                + (f'<div class="muted">{escape(str(f["anchor"]))}</div>' if f.get("anchor") else "") + "</div>")
-    return (f'<section class="hero"><div class="ring {level_class(ratio)}" style="--p:{ratio * 100:.1f}">'
+    if b.get("loss"):
+        lo = b["loss"]
+        fix += (f'<div class="top-loss"><span class="k">가장 큰 손실</span> <span class="v">{escape(str(lo["name"]))}</span> '
+                f'<span class="lost">-{lo["lost"]:.1f}점</span></div>')
+    return (f'<section class="hero"><div class="ring {level_class(ratio)}" style="--p:{ratio * 100:.1f}" '
+            f'role="img" aria-label="{b["max"]:g}점 중 {b["score"]:.1f}점">'
             f'<div class="ring-in"><span class="hero-score">{b["score"]:.1f}</span>'
             f'<span class="hero-max">/ {b["max"]:g}</span></div></div>'
             f'<div><p class="hero-caption">{escape(str(b.get("caption") or ""))}</p><ul class="hero-sub">{sub}</ul>{fix}</div></section>')
 
 
 def _fix_html(n: int, f: dict) -> str:
-    dl = "".join(f"<dt>{label}</dt><dd>{escape(str(f[key]))}</dd>"
-                 for key, label in (("anchor", "다음 기준 문장 — 이 문장이 자료에 생기게 만든다"), ("caps", "걸린 상한"), ("hint", "해제 조건"))
-                 if f.get(key))
+    fields = [("anchor", "다음 기준 문장 — 이 문장이 자료에 생기게 만든다"), ("caps", "심사위원이 적용한 상한"), ("hint", "해제 조건")]
+    if f.get("caps"):
+        # 상한에 걸린 항목은 기준 문장보다 상한을 푸는 조건이 먼저다
+        fields = [fields[2], fields[1], fields[0]]
+    dl = "".join(f"<dt>{label}</dt><dd>{escape(str(f[key]))}</dd>" for key, label in fields if f.get(key))
     return (f'<div class="fix"><span class="n">{n}</span><div><span class="t">{escape(str(f["name"]))}</span>'
-            f'<span class="now">{escape(str(f["now"]))}</span><dl>{dl}</dl></div><span class="gain">+{f["gain"]:g}점</span></div>')
+            f'<span class="now">{escape(str(f["now"]))}</span><dl>{dl}</dl></div><span class="gain">+{f["gain"]:.1f}점</span></div>')
 
 
 VERDICT_CLASS = {"올림": "v-up", "그대로": "v-same", "깎음": "v-down"}
