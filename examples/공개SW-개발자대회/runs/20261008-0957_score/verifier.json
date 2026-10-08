@@ -1,0 +1,147 @@
+{
+  "persona": "verifier",
+  "model": "opus",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 5,
+      "items": {
+        "code-structure": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "code-completeness": {
+          "score": 6,
+          "quotes": [
+            "python3 -m pytest              # 테스트"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "doc-specificity": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "function-test": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 넘는다"
+        },
+        "oss-usage": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘는다"
+        },
+        "originality": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "community-potential": {
+          "score": 2,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘는다"
+        },
+        "demo": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "시연 영상(3분) 또는 단계별 시연 시나리오가 제출돼야 넘는다"
+        }
+      },
+      "summary": "HEAD 348ac72를 git archive로 따로 풀어 README 절차인 python3 -m pytest를 돌렸습니다. 86 passed, 0 failed로 통과입니다. 예외 입력 검사는 실패입니다. 없는 폴더를 주면 rank_ideas.py, render_report.py, render_dashboard.py가 FileNotFoundError traceback을 내므로 기능테스트는 5점입니다. contest_dirs.py new-run은 없는 대회 폴더를 받아도 오류 없이 runs 폴더를 만듭니다. LICENSE, CONTRIBUTING, 발표자료, 시연 영상은 레포에 없습니다. 커밋 14개가 모두 2026-10-08 하루에 작성자 1명으로 올라와 있습니다."
+    },
+    {
+      "gate_score": 4,
+      "items": {
+        "code-structure": {
+          "score": 6,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "code-completeness": {
+          "score": 6,
+          "quotes": [
+            "python3 -m pytest              # 테스트"
+          ],
+          "cap_applied": "quote-for-seven",
+          "unlock_hint": "시연 영상과 함께, README 절차대로 실행하면 테스트 N개가 통과한다는 결과가 원문에 적혀 있어야 7점 이상이다"
+        },
+        "doc-specificity": {
+          "score": 5,
+          "quotes": [
+            "python3 tools/sync_shared.py   # shared/ 를 고친 뒤 각 skill로 복사"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "function-test": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF)나 발표 영상이 제출돼야 3점을 넘는다"
+        },
+        "oss-usage": {
+          "score": 3,
+          "quotes": [
+            "npx skills add Cassiiopeia/pro-judge"
+          ],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 4점을 넘는다"
+        },
+        "originality": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "community-potential": {
+          "score": 1,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 LICENSE 파일이 있어야 하고, CONTRIBUTING 문서나 이슈 템플릿이 있으며, 커밋 이력이 대회 기간 전체에 걸쳐 있어야 상한을 넘는다"
+        },
+        "demo": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "3분 시연 영상이나 단계별 시연 시나리오가 제출돼야 5점을 넘는다"
+        }
+      },
+      "summary": "HEAD 348ac72를 따로 꺼내 테스트를 돌린 결과 86개 전부 통과했고, contest_dirs init/new-run → validate_rubric → validate_persona → aggregate → render_report → render_dashboard 순서로 실제로 돌려도 정상 동작했다(총점 62.0, report.md/html·index.html 생성). 예외 입력은 실패다. ideas.json·result.json·history.md가 없는 폴더를 넣으면 rank_ideas·render_report·render_dashboard가 FileNotFoundError traceback을 낸다. rubric.yaml 문법이 깨져 있으면 validate_rubric·validate_persona·render_dashboard·aggregate가 YAML traceback을 내고, 이 경우들은 모두 종료코드 0으로 끝난다. LICENSE·CONTRIBUTING 파일, 발표자료, 시연 영상은 없다."
+    }
+  ]
+}
