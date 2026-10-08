@@ -12,6 +12,7 @@ import argparse
 import collections
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -44,13 +45,12 @@ def _upstream_section(repo: Path, upstream: str) -> list:
         # fork의 기본 브랜치는 원본과 같고 팀 작업은 별도 브랜치에 있는 경우가 많다(실측: tsnlab/zephyr) — 모든 브랜치를 본다
         refs = ["HEAD", "--branches", f"--remotes=origin"]
         log = _git(repo, "log", *refs, "--not", "FETCH_HEAD", "--format=%ad|%an", "--date=short", check=True)
-        branches = []
-        for ref in _git(repo, "for-each-ref", "--format=%(refname:short)", "refs/remotes/origin", "refs/heads").split():
-            if ref.endswith("/HEAD"):
-                continue
-            n = int(_git(repo, "rev-list", "--count", ref, "--not", "FETCH_HEAD").strip() or 0)
-            if n:
-                branches.append((ref.split("/", 1)[1] if ref.startswith("origin/") else ref, n))
+        refs = [r for r in _git(repo, "for-each-ref", "--format=%(refname:short)", "refs/remotes/origin", "refs/heads").split()
+                if not r.endswith("/HEAD")]
+        # 브랜치가 수십 개인 fork에서 rev-list를 하나씩 기다리면 쌓인다 — 읽기 전용이라 동시에 돌려도 안전하다
+        with ThreadPoolExecutor(max_workers=max(1, min(8, len(refs)))) as pool:
+            counts = pool.map(lambda r: int(_git(repo, "rev-list", "--count", r, "--not", "FETCH_HEAD").strip() or 0), refs)
+            branches = [(r.split("/", 1)[1] if r.startswith("origin/") else r, n) for r, n in zip(refs, counts) if n]
     except RuntimeError as e:
         return [f"- fork 원본 비교 실패: {e}"]
     authors = _authors(log)
