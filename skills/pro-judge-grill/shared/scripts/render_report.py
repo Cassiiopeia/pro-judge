@@ -35,6 +35,9 @@ def _score_blocks(r: dict) -> list:
     if r["no_official_criteria"]:
         b.append({"type": "callout", "label": "공식 기준 없음",
                   "text": "모든 항목이 추정(inferred)이다. 점수는 참고용이다."})
+    if not r.get("evidence"):
+        b.append({"type": "callout", "label": "근거 장부 없음",
+                  "text": "무엇을 봤고 무엇을 못 봤는지 기록되지 않았다(evidence.yaml). 빠진 자료 때문에 깎인 점수를 구분할 수 없다."})
     if not r["calibrated"]:
         b.append({"type": "callout", "label": "보정 안 됨",
                   "text": "역대 수상작으로 점수표를 검증하지 않았다."})
@@ -68,6 +71,8 @@ def _score_blocks(r: dict) -> list:
            "rows": [[n, f["name"], f"{f.get('level', 0):.1f} → {f.get('next_anchor', '-')}", f"+{f['gain']:g}",
                      f.get("next_anchor_text") or "-", ", ".join(f["caps"]) or "-", (f["unlock_hints"] or ["-"])[0]]
                     for n, f in enumerate(r["fix_priority"], 1)]}]
+
+    b += _evidence_blocks(r.get("evidence"))
 
     names = {i["id"]: i["name"] for i in r["items"]}
     b += [{"type": "h2", "text": "편차 경보"},
@@ -103,6 +108,29 @@ def _score_blocks(r: dict) -> list:
           {"type": "p", "text": "경고"},
           {"type": "list", "items": r["warnings"]}]
     return b
+
+
+EVIDENCE_TYPE_LABEL = {"numbers": "숫자", "proper-nouns": "고유명사", "demo": "시연", "field-test": "실증",
+                       "quote": "인용", "observation": "관찰", None: "-"}
+SOURCE_LABEL = {"file": "파일", "repo": "저장소", "url": "URL", "web": "웹 검색", "user": "사용자", "video": "영상"}
+TRUST_LABEL = {"official": "공식", "reported": "보도·제3자", "self": "팀 자료", "user": "사용자 진술"}
+
+
+def _evidence_blocks(ev) -> list:
+    """채점 전에 무엇을 봤고 무엇을 못 봤는지 — 빈칸 때문에 깎인 점수를 자료 부족과 구분하게 한다."""
+    if not ev:
+        return []
+    def label(g):
+        return f"{g['name']}: {EVIDENCE_TYPE_LABEL.get(g['type'], g['type'])}" if g.get("type") else g["name"]
+    return [{"type": "h2", "text": "확인한 자료와 빈칸"},
+            {"type": "table", "headers": ["출처", "어디서", "어떻게", "신뢰", "상태"],
+             "rows": [[SOURCE_LABEL.get(s["kind"], s["kind"]), s["ref"], s.get("how") or "-",
+                       TRUST_LABEL.get(s["trust"], s["trust"]), s["status"] + (f" ({s['note']})" if s.get("note") else "")]
+                      for s in ev["sources"]]},
+            {"type": "p", "text": "못 본 것 — 점수표가 요구하는 근거 중 자료에서 찾지 못한 것. 이 항목의 점수는 자료를 넣으면 달라질 수 있다."},
+            {"type": "list", "items": [label(g) for g in ev["gaps"]]},
+            {"type": "p", "text": "없다고 확인된 것"},
+            {"type": "list", "items": [f"{label(a)} — {a['text']}" for a in ev["absent"]]}]
 
 
 VERDICT_LABEL = {"up": "올림", "same": "그대로", "down": "깎음", None: "-"}
