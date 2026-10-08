@@ -5,17 +5,19 @@
 #
 # 릴리스 자동화(PROJECT-VERSION-CONTROL)는 태그만 만든다. Release 가 없으면 Watch → Releases
 # 알림이 가지 않고 사용자는 받을 버전을 태그 목록에서 추측해야 한다.
-# 버전 관리 워크플로우가 끝나면 version.yml 의 버전으로 Release 를 만들고, 본문은 CHANGELOG 해당 절을 쓴다.
+# main 에 버전이 반영되면 version.yml 의 버전으로 Release 를 만들고, 본문은 CHANGELOG 해당 절을 쓴다.
 # 이미 있으면 아무것도 하지 않는다(재실행 안전).
+#
+# 트리거가 main push + workflow_dispatch 인 이유: 릴리스 PR 을 GITHUB_TOKEN 으로 머지하면 push 로는 워크플로우가
+# 돌지 않는다. projectops(dispatch_downstream.py)가 "main push 로 돌고 workflow_dispatch 를 지원하는" 워크플로우를
+# 다시 깨운다. 버전 관리 워크플로우는 그 대상에서 빠져 있어 workflow_run 으로는 신호가 오지 않는다(실측 v0.4.1).
 # ===================================================================
 
 name: PROJECT-RELEASE-PUBLISH
 
 on:
-  workflow_run:
-    workflows: ["PROJECT-VERSION-CONTROL"]
-    types: [completed]
-    branches: [main]
+  push:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -23,7 +25,6 @@ permissions:
 
 jobs:
   publish:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: 체크아웃
@@ -37,8 +38,13 @@ jobs:
         run: |
           VERSION=$(grep -E '^version:' version.yml | sed -E 's/version: *"?([^"]+)"?.*/\1/')
           TAG="v${VERSION}"
+          # 태그는 릴리스 워크플로우가 머지 직후에 만든다 — 늦게 생길 수 있어 최대 2분 기다린다
+          for i in $(seq 1 12); do
+            git ls-remote --tags origin "refs/tags/${TAG}" | grep -q "${TAG}" && break
+            sleep 10
+          done
           if ! git ls-remote --tags origin "refs/tags/${TAG}" | grep -q "${TAG}"; then
-            echo "태그 ${TAG} 가 아직 없다 — 건너뛴다"; exit 0
+            echo "태그 ${TAG} 가 없다 — 건너뛴다"; exit 0
           fi
           if gh release view "${TAG}" >/dev/null 2>&1; then
             echo "Release ${TAG} 가 이미 있다"; exit 0
