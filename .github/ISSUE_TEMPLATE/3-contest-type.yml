@@ -1,0 +1,22 @@
+name: 🏆 대회 종류 요청
+description: "지원하지 않는 대회 종류(예: 스포츠, 디자인 공모전)의 프로필을 요청할 때"
+labels: [enhancement]
+body:
+  - type: input
+    id: contest
+    attributes:
+      label: 대회 이름과 공고
+      placeholder: 2026 ○○ 공모전 https://...
+    validations:
+      required: true
+  - type: textarea
+    id: different
+    attributes:
+      label: 기존 종류와 무엇이 다른가
+      description: "지금 종류(open-source, disability, social-impact, startup, public-data, ai-tech)로 등록했을 때 빠지는 것"
+    validations:
+      required: true
+  - type: textarea
+    id: judges
+    attributes:
+      label: 심사위원 구성·심사 방식 (아는 만큼)

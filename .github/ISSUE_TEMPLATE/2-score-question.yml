@@ -1,0 +1,36 @@
+name: 🤔 채점 결과가 이상해요
+description: 점수나 고칠 것 순위가 납득되지 않을 때
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        먼저 보고서 맨 위 안내("인용 원문 대조 안 함", "근거 장부 없음")와 "확인한 자료와 빈칸" 절을 확인해 달라.
+        빈칸 때문에 깎인 점수는 자료를 넣으면 달라진다. 공개하기 어려운 내용은 요약만 적어도 된다.
+  - type: input
+    id: contest
+    attributes:
+      label: 대회
+      placeholder: 2026 장애인 분야 해커톤 / 공고 URL
+    validations:
+      required: true
+  - type: input
+    id: item
+    attributes:
+      label: 이상한 항목
+      placeholder: 참신성 — 4점
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: 기대한 점수와 이유
+      description: 자료의 어느 부분이 근거인지
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: 붙일 수 있는 파일
+      description: rubric.yaml의 해당 항목, result.json의 해당 항목, evidence.yaml (민감한 부분은 지워도 된다)
+      render: yaml
