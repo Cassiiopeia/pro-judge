@@ -1,0 +1,18 @@
+# 비슷한 도구와의 차이
+
+LLM으로 결과물을 채점하는 도구는 이미 있다. pro-judge는 **대회 하나를 위한 심사**에 맞춰져 있다.
+
+| | 한 줄 프롬프트 | promptfoo `llm-rubric` | DeepEval G-Eval | **pro-judge** |
+| --- | --- | --- | --- | --- |
+| 무엇을 채점하나 | 아무거나 | LLM 출력 | LLM 출력 | **대회 출품 자료**(발표자료·레포·배포 URL) |
+| 기준 | 프롬프트 한 줄 | 자연어 기준 한 개 | `criteria` 또는 `evaluation_steps` | **공고에서 펼친 점수표** — 질문·0/5/10 기준 문장·상한, 출처 표시 |
+| 채점자 | 1명 | 평가 모델 1개 | 평가 모델 1개 | **대회 구성을 따른 심사위원 여럿**, 서로 독립 |
+| 결과 | 점수 | `score` 0.0~1.0, `pass`, `reason` | `score` 0~1, `reason` | 항목별 점수·배점 환산 총점·**고칠 것 순위**·편차 경보 |
+| 근거 확인 | 없음 | 없음 | 없음 | **인용을 원문과 대조**, 없는 인용은 삭제 |
+| 못 본 것 | 알 수 없음 | — | — | **근거 장부**로 빈칸을 보고서에 표시 |
+| 실제 결과로 검증 | — | — | — | [수상 결과로 2회](/validation) |
+
+- promptfoo와 DeepEval은 LLM 애플리케이션의 출력을 테스트하는 범용 평가 프레임워크다. 기준 하나로 통과·실패와 점수를 낸다.
+  ([promptfoo llm-rubric 문서](https://www.promptfoo.dev/docs/configuration/expected-outputs/model-graded/llm-rubric/), [DeepEval G-Eval 문서](https://deepeval.com/docs/metrics-llm-evals))
+- pro-judge는 반대 방향이다. 사람이 만든 출품 자료를, 특정 대회의 심사석에서 보는 눈으로 채점하고, **다음에 무엇을 고칠지**를 낸다.
+- 같은 대회 자료로 한 줄 프롬프트와 비교한 결과는 [검증 결과](/validation)에 있다 — 순위 판별은 조금 낫고(29 vs 26 / 36), 점수 폭이 넓고, 깎인 이유가 남는다.

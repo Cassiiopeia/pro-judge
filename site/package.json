@@ -1,0 +1,17 @@
+{
+  "name": "pro-judge-site",
+  "private": true,
+  "version": "0.0.0",
+  "description": "pro-judge 문서 사이트 (VitePress, GitHub Pages) — 설치되는 skill 묶음에는 들어가지 않는다",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev .",
+    "docs:build": "vitepress build .",
+    "docs:preview": "vitepress preview ."
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "mermaid": "^11.4.1",
+    "vitepress-plugin-mermaid": "^2.0.17"
+  }
+}
