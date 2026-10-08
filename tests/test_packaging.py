@@ -64,3 +64,30 @@ def test_hook_injects_guide(tmp_path):
     ctx = out["hookSpecificOutput"]["additionalContext"]
     assert out["hookSpecificOutput"]["hookEventName"] == "SessionStart"
     assert "pro-judge 길잡이" in ctx
+
+
+def contest_type_sources(root):
+    """대회 종류 목록이 적힌 세 곳 — 하나만 고치면 검사기와 문서가 어긋난다."""
+    import re
+    profiles = {p.stem for p in (root / "shared" / "references" / "contest-types").glob("*.md")}
+    schema_line = next(l for l in (root / "shared" / "references" / "rubric-schema.md").read_text(encoding="utf-8").splitlines()
+                       if "purpose.contest_types" in l)
+    schema = set(re.findall(r"[a-z]+(?:-[a-z]+)*", schema_line.split("|")[3])) - {"중"}
+    validator = set(re.search(r"CONTEST_TYPES = \{([^}]*)\}",
+                              (root / "shared" / "scripts" / "validate_rubric.py").read_text(encoding="utf-8")).group(1)
+                    .replace('"', "").replace(" ", "").split(","))
+    return profiles, schema, validator
+
+
+def test_contest_types_listed_everywhere():
+    profiles, schema, validator = contest_type_sources(ROOT)
+    assert profiles == schema == validator, "대회 종류를 추가했으면 CONTRIBUTING.md의 '대회 종류 추가' 세 곳을 모두 고칠 것"
+
+
+def test_contest_type_check_catches_drift(tmp_path):
+    import shutil
+    for d in ("shared/references", "shared/scripts"):
+        shutil.copytree(ROOT / d, tmp_path / d)
+    (tmp_path / "shared/references/contest-types/sports.md").write_text("# sports\n", encoding="utf-8")
+    profiles, schema, validator = contest_type_sources(tmp_path)
+    assert profiles != schema
