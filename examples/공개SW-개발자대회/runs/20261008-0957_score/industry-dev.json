@@ -1,0 +1,163 @@
+{
+  "persona": "industry-dev",
+  "model": "opus",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 5,
+      "items": {
+        "code-structure": {
+          "score": 6,
+          "quotes": [
+            "`skills/*/shared/`는 생성물이다. 직접 고치지 말고 `shared/`를 고친다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "code-completeness": {
+          "score": 6,
+          "quotes": [
+            "python3 -m pytest              # 테스트",
+            "필요: Python 3.9+, PyYAML (`python3 -m pip install pyyaml`)"
+          ],
+          "cap_applied": "quote-for-seven",
+          "unlock_hint": "3분 시연 영상과 README에 '테스트 N개 통과'처럼 숫자로 적힌 결과가 있어야 7점을 넘습니다"
+        },
+        "doc-specificity": {
+          "score": 6,
+          "quotes": [
+            "python3 $SKILL/shared/scripts/contest_dirs.py new-run &lt;대회 폴더&gt; score"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [
+            "같은 입력이면 같은 숫자가 나와야 하므로 점수 계산은 전부 여기서 한다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "function-test": {
+          "score": 6,
+          "quotes": [],
+          "cap_applied": "quote-for-seven",
+          "unlock_hint": "명시 기능별로 테스트 절차와 통과 결과를 정리한 원문이 있어야 7점을 넘습니다"
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 넘는다"
+        },
+        "oss-usage": {
+          "score": 4,
+          "quotes": [
+            "npx skills add Cassiiopeia/pro-judge"
+          ],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘는다"
+        },
+        "originality": {
+          "score": 5,
+          "quotes": [
+            "대회에 나가기 전에 **실제 심사를 미리 받아 보는** Agent Skills 묶음이다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "community-potential": {
+          "score": 2,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘는다"
+        },
+        "demo": {
+          "score": 4,
+          "quotes": [
+            "이 대회 나갈 거야 &lt;공고 URL&gt;"
+          ],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "시연 영상(3분) 또는 단계별 시연 시나리오가 제출돼야 넘는다"
+        }
+      },
+      "summary": "직접 돌려 봤습니다. 테스트는 85개 통과에 1개 실패이고, 실패한 1개는 커밋되지 않은 변경 때문입니다. 잘못된 경로를 넣으면 traceback 없이 한 줄 오류가 나옵니다. 모듈은 9개 스크립트로 책임별로 나뉘어 있지만, 같은 코드가 skills 5곳에 그대로 복사돼 커밋돼 있습니다. LICENSE·CONTRIBUTING·시연 영상·발표자료가 없고, 커밋 14개가 하루에 몰려 있으며 작성자가 1명입니다. 그래서 2차 항목이 전부 상한에 걸립니다. LICENSE, 3분 시연 영상, 설계 문서(현재 /docs/는 gitignore)를 레포에 넣으면 상한이 풀립니다."
+    },
+    {
+      "gate_score": 5,
+      "items": {
+        "code-structure": {
+          "score": 7,
+          "quotes": [
+            "class InputError(Exception):\n    \"\"\"사용자가 고칠 수 있는 입력 오류. CLI는 메시지 한 줄만 찍고 끝낸다.\"\"\"",
+            "`skills/*/shared/`는 생성물이다. 직접 고치지 말고 `shared/`를 고친다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": "10점이 되려면 에러 처리를 한 가지로 맞춰야 합니다. 지금은 report_blocks.py만 InputError가 아니라 ValueError(\"모르는 블록 ...\")를 던집니다. 각 스크립트가 맡은 일도 문서에 한 문장씩 있어야 합니다."
+        },
+        "code-completeness": {
+          "score": 6,
+          "quotes": [
+            "python3 -m pytest              # 테스트"
+          ],
+          "cap_applied": "claim-not-verified",
+          "unlock_hint": "HEAD 348ac72에서 pytest를 돌려 86 passed를 직접 확인했습니다. 그런데 시연 영상이 없고, 핵심인 skill 5종이 README 설치 절차(npx skills add)대로 동작하는 것도 확인되지 않았습니다. README에 테스트 통과 수와 3분 시연 영상이 있어야 7점을 넘습니다."
+        },
+        "doc-specificity": {
+          "score": 5,
+          "quotes": [
+            "# 설계·계획 문서는 로컬 전용\n/docs/"
+          ],
+          "cap_applied": null,
+          "unlock_hint": "설계 문서는 .gitignore에 걸려 레포에 없습니다. 레포에는 README와 SKILL.md만 있습니다. 스크립트 9개의 구조도, 데이터 흐름(rubric→persona→aggregate→render), 파일 경로가 적힌 설계 문서가 레포에 있어야 7점 이상입니다."
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "직접 만든 로직(검사기 2종, 합산기 318줄, 보고서·대시보드 렌더러)은 있습니다. 하지만 상한 적용이나 그룹 가중 합산 같은 기술적 난점을 문서에서 설명하지 않습니다. 난점 2개 이상을 문서로 설명하고 그 부분을 테스트와 연결해야 7점을 넘습니다."
+        },
+        "function-test": {
+          "score": 6,
+          "quotes": [],
+          "cap_applied": "claim-not-verified",
+          "unlock_hint": "잘못된 입력에는 traceback 없이 '오류: /nonexistent 위쪽에서 rubric.yaml을 찾지 못함 — --contest-dir로 지정' 한 줄로 응답했습니다. 핵심 기능인 skill 흐름(등록→채점→질의응답)은 직접 실행으로 확인되지 않았습니다. 명시 기능별 테스트 절차와 그 결과가 있어야 넘습니다."
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF)나 발표 영상이 제출돼야 3점을 넘습니다. 문제 규모·결과 숫자와 시연 화면까지 있으면 10점입니다."
+        },
+        "oss-usage": {
+          "score": 3,
+          "quotes": [
+            "npx skills add Cassiiopeia/pro-judge"
+          ],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 LICENSE 파일이 없습니다. OSI 승인 라이선스 파일과 의존성(PyYAML 등)의 라이선스 목록이 있어야 4점 상한을 넘습니다."
+        },
+        "originality": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "README에서 비교하는 기존 도구 이름이 없고, 무엇이 다른지도 적혀 있지 않습니다. 기존 도구 2개 이상을 이름으로 비교하고, 그 차별 기능이 코드 어디에 있는지 밝혀야 7점 이상입니다."
+        },
+        "community-potential": {
+          "score": 2,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "LICENSE, CONTRIBUTING, 이슈 템플릿이 없습니다. 커밋 14개가 모두 2026-10-08 하루에 작성자 1명입니다(last-minute-commits에도 걸림). LICENSE와 기여 문서, 대회 기간에 걸친 커밋 이력, 외부 기여자·이슈 숫자가 있어야 오릅니다."
+        },
+        "demo": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "실행물(스크립트·skill)은 있습니다. 시연 영상과 단계별 시연 시나리오가 없습니다. 핵심 기능을 실제 입력으로 보여 주는 3분 영상이나 같은 절차로 재현되는 시나리오가 있어야 5점 상한을 넘습니다."
+        }
+      },
+      "summary": "HEAD 기준 테스트 86개 통과는 직접 돌려서 확인했습니다. 모듈은 나뉘어 있고 입력 오류는 한 줄로 처리됩니다. 하지만 LICENSE, 기여 경로, 발표자료, 시연 영상이 없고 커밋은 하루 동안 1명이 했습니다. 그래서 2차 평가 항목은 상한에 막힙니다. 돌려 봤나요? skill 5종이 README 설치 절차대로 동작하는 것을 보여 주는 영상부터 내야 합니다."
+    }
+  ]
+}

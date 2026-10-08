@@ -72,6 +72,13 @@ def test_bars_do_not_shrink_on_phone():
     assert "width:58.2%" in html and "32 / 55" in html
 
 
+def test_bar_tracks_align_across_rows():
+    # 행마다 grid가 따로라 점수 열이 auto면 '2 / 20'과 '4.75 / 15' 행의 막대 길이가 달라진다
+    html = to_html([{"type": "bars", "rows": [{"label": "a", "value": 2, "max": 20}]}], "T")
+    row_css = re.search(r"\.bar-row\{[^}]*grid-template-columns:([^;}]*)", html).group(1)
+    assert "auto" not in row_css
+
+
 def test_cli(tmp_path, result):
     write_json(tmp_path / "result.json", result)
     assert render_report.main([str(tmp_path)]) == 0

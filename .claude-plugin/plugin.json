@@ -1,6 +1,9 @@
 {
   "name": "pro-judge",
   "description": "대회 심사위원 하네스 — 심사기준을 점수표·페르소나로 펼치고 제출 전에 실제 심사를 미리 받는다",
-  "author": { "name": "Cassiiopeia" },
-  "repository": "https://github.com/Cassiiopeia/pro-judge"
+  "author": {
+    "name": "Cassiiopeia"
+  },
+  "repository": "https://github.com/Cassiiopeia/pro-judge",
+  "license": "Apache-2.0"
 }
