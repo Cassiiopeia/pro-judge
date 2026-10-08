@@ -49,7 +49,12 @@ python3 $SKILL/shared/scripts/extract_target.py <런 폴더> <파일...> [--page
 - PPTX는 슬라이드의 글 상자만 읽힌다. 슬라이드 속 그림 글자까지 필요하면 PDF로 내보내 다시 넣는다.
 - hwp·ppt·doc은 PDF로 저장해 달라고 한다.
 
-레포는 README와 읽은 코드 발췌를, 배포 URL은 화면에서 읽은 글과 누른 결과 기록을 `target/`에 직접 쓴다.
+레포는 `repo_facts.py`로 사실을 뽑아 `target/`에 저장하고(fork면 `--upstream`), 배포 URL은 화면에서 읽은 글과 누른 결과 기록을 `target/`에 직접 쓴다.
+
+### 근거 장부
+
+이어서 `pro-judge-gather`를 **대상 모드**로 따른다(장부: `<런 폴더>/evidence.yaml`). 위 수집도 그 절차의 1단계다.
+빈칸은 웹에서 찾고, 남으면 사용자에게 배점 큰 항목부터 하나씩 묻는다(최대 5개). 장부가 없으면 보고서에 "근거 장부 없음"이 찍힌다.
 
 ## 4. 페르소나별 독립 실행
 

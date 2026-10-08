@@ -95,7 +95,9 @@ npx skills add Cassiiopeia/pro-judge -a codex -y     # 에이전트를 지정해
 이 레포 채점해줘
 ```
 
-심사위원마다 따로 채점한 뒤 합산해 보고서를 만든다. 자료를 고친 뒤 다시 채점하면 지난번 대비 몇 점이 바뀌었는지도 보여 준다.
+채점 전에 자료를 모으고, 점수표가 요구하는 근거 중 빠진 것을 웹에서 찾는다. 그래도 비면 배점이 큰 항목부터 하나씩 묻는다
+("작품 데모 항목에 시연 근거가 없습니다. 시연 영상 링크가 있나요?"). 그다음 심사위원마다 따로 채점하고 합산해 보고서를 만든다.
+자료를 고친 뒤 다시 채점하면 지난번 대비 몇 점이 바뀌었는지도 보여 준다.
 
 ### 4. 질의응답 연습
 
@@ -120,7 +122,9 @@ docs/pro-judge/
         └── 20261008-1405_score/
             ├── report.html     보고서 (외부 요청 없는 파일 하나)
             ├── report.md
-            └── result.json
+            ├── result.json
+            ├── evidence.yaml   무엇을 봤고 무엇을 못 봤는지 (근거 장부)
+            └── target/         채점한 원문 (인용 대조용)
 ```
 
 이 폴더는 처음 만들 때 `.gitignore`가 함께 생겨 **기본으로 git에 올라가지 않는다.** 팀과 공유하려면 그 `.gitignore`를 지운다.
@@ -129,6 +133,7 @@ docs/pro-judge/
 
 - **진단 지표다. 실제 대회 점수 예측이 아니다.** 같은 점수표로 고치기 전과 후를 비교하는 데 쓴다.
 - 총점 옆 범위는 "공고에 없어 추정한 규칙을 ±1점 움직였을 때"의 폭이다. 통계적 신뢰구간이 아니다.
+- "확인한 자료와 빈칸" 절에서 무엇을 못 봤는지 본다. 빈칸 항목의 점수는 자료를 넣으면 달라질 수 있다.
 - 보고서 맨 위의 주황색 안내를 먼저 본다. "인용 원문 대조 안 함"이 있으면 7점 이상 점수를 그대로 믿지 않는다.
 - 역대 수상작을 같은 점수표로 채점해 두면("작년 대상작 보정용으로 채점해줘") 내 점수를 어디에 견줄지 감을 잡을 수 있다. 보정 채점은 내 회차 비교와 추이에 섞이지 않는다.
 
@@ -187,7 +192,7 @@ Claude Code 플러그인은 `/plugin marketplace update pro-judge`로 갱신한�
 ## 제거
 
 ```bash
-npx skills remove using-pro-judge pro-judge-setup pro-judge-ideas pro-judge-score pro-judge-grill
+npx skills remove using-pro-judge pro-judge-setup pro-judge-gather pro-judge-ideas pro-judge-score pro-judge-grill
 ```
 
 플러그인은 `/plugin uninstall pro-judge@pro-judge`. 대회 자료(`docs/pro-judge/`)는 지워지지 않는다.
@@ -198,6 +203,7 @@ npx skills remove using-pro-judge pro-judge-setup pro-judge-ideas pro-judge-scor
 | --- | --- |
 | `using-pro-judge` | 길잡이. 요청을 알아듣고 아래 skill을 부른다 |
 | `pro-judge-setup` | 대회 등록. 공고·심사기준 → 점수표 + 페르소나 + 취지 |
+| `pro-judge-gather` | 정보 수집. 자료를 자동으로 모으고, 빈칸은 웹에서 찾고 사용자에게 묻는다. 무엇을 봤는지 근거 장부로 남긴다 (setup·score가 먼저 부른다) |
 | `pro-judge-ideas` | 아이디어 비교. 완벽히 구현했다면 받을 상한 점수로 순위 |
 | `pro-judge-score` | 자료 채점. 페르소나별 독립 채점, 고칠 것 순위 |
 | `pro-judge-grill` | 질의응답 연습. 약한 곳을 찌르는 질문과 답변 판정 |

@@ -1,6 +1,6 @@
 ---
 name: using-pro-judge
-description: pro-judge 길잡이. 대회 심사 준비 요청을 알아듣고 맞는 skill(pro-judge-setup·ideas·score·grill)로 보낸다. "이 대회 나갈 거야", "공고 등록해줘", "심사기준 이거야", "몇 점이야", "채점해줘", "다시 봐줘", "아이디어 뭐가 나아", "질의응답 연습하자", "예상 질문 뽑아줘" 같은 요청이나, 레포에 docs/pro-judge/가 있을 때 사용한다.
+description: pro-judge 길잡이. 대회 심사 준비 요청을 알아듣고 맞는 skill(pro-judge-setup·gather·ideas·score·grill)로 보낸다. "이 대회 나갈 거야", "공고 등록해줘", "심사기준 이거야", "몇 점이야", "채점해줘", "다시 봐줘", "아이디어 뭐가 나아", "질의응답 연습하자", "예상 질문 뽑아줘" 같은 요청이나, 레포에 docs/pro-judge/가 있을 때 사용한다.
 ---
 
 # pro-judge 길잡이
@@ -16,6 +16,7 @@ description: pro-judge 길잡이. 대회 심사 준비 요청을 알아듣고 �
 | "아이디어 중 뭐가 점수 잘 나와?" | `pro-judge-ideas` |
 | "이 자료 몇 점이야?" / "다시 봐줘" / "고쳤어" | `pro-judge-score` |
 | "질의응답 연습하자" / "예상 질문 뽑아줘" | `pro-judge-grill` |
+| "자료 더 찾아줘" / "뭐가 빠졌어" / "근거 모아줘" | `pro-judge-gather` (setup·score는 알아서 먼저 부른다) |
 
 ## 규칙
 
