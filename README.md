@@ -183,6 +183,8 @@ python3 tools/sync_shared.py   # shared/ 를 고친 뒤 각 skill로 복사
 `skills/*/shared/`는 `shared/`의 사본이다. `npx skills`는 skill 폴더 하나만 복사하므로 공용 스크립트를 각 skill에 넣어 둔다.
 직접 고치지 말고 `shared/`를 고친 뒤 `tools/sync_shared.py`를 돌린다. 사본이 어긋나면 테스트가 실패한다.
 
+이슈·PR 흐름, 대회 종류 추가 방법, AI로 만든 PR 정책은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있다.
+
 ## 라이선스
 
 [Apache-2.0](LICENSE)
