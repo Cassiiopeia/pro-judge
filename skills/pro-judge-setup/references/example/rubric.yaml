@@ -1,0 +1,65 @@
+contest: 테스트-해커톤
+purpose:
+  official: "누구나 쓰는 공공 서비스를 만든다"
+  contest_types: [social-impact, ai-tech]
+gate:
+  source: official
+  bands:
+    - {min: 8, multiplier: 1.0}
+    - {min: 5, multiplier: 0.85}
+    - {min: 0, multiplier: 0.6}
+calibration:
+  status: none
+evaluator_groups:
+  - id: judges
+    weight: 70
+    source: official
+    personas: [developer, domain-expert]
+  - id: citizens
+    weight: 30
+    source: inferred
+    why: "공고에 시민 투표 30%가 있으나 구성원 설명은 없음"
+    personas: [citizen]
+items:
+  - id: feasibility
+    name: 실현 가능성
+    points: {judges: 40, citizens: 15}
+    source: official
+    official_text: "실제로 실현 가능한 내용을 제시하는가"
+    questions:
+      - text: "지금 작동하는 것을 보여 주는가"
+        source: inferred
+        why: "실현 가능성의 가장 직접적인 근거는 작동하는 결과물"
+      - text: "누가 언제 운영하는지 밝히는가"
+        source: inferred
+        why: "운영 주체가 없으면 실현 경로가 없다"
+    evidence_types: [demo, numbers]
+    anchors:
+      0: "작동하는 화면이나 배포 주소가 없다"
+      5: "핵심 기능 1개가 시연되지만 운영 주체가 없다"
+      10: "배포 주소에서 핵심 기능이 모두 작동하고 운영 주체와 일정이 숫자로 있다"
+    caps:
+      - rule: no-demo
+        cap: 4
+        unlock: "배포 주소나 시연 영상에서 핵심 기능이 작동해야 넘는다"
+        source: inferred
+        why: "시연 없는 실현 가능성 주장은 의도에 가깝다"
+  - id: impact
+    name: 파급력
+    points: {judges: 30, citizens: 15}
+    source: official
+    official_text: "사회에 미치는 영향이 큰가"
+    questions:
+      - text: "영향받는 사람 수를 숫자로 밝히는가"
+        source: inferred
+        why: "규모는 숫자로만 비교된다"
+      - text: "당사자가 써 본 결과가 있는가"
+        source: inferred
+        why: "실사용 결과가 영향의 직접 근거"
+    evidence_types: [numbers, field-test]
+    anchors:
+      0: "대상과 규모가 없다"
+      5: "대상 규모 숫자는 있으나 실사용 결과가 없다"
+      10: "대상 규모 숫자와 실사용자 몇 명이 썼는지 결과가 있다"
+    caps: []
+common_caps: [intent-not-evidence, no-specifics, claim-not-verified, claim-failed, quote-for-seven, length-neutral]

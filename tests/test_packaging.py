@@ -1,0 +1,56 @@
+import json
+import os
+import subprocess
+import sys
+
+from conftest import ROOT
+
+sys.path.insert(0, str(ROOT / "tools"))
+import sync_shared  # noqa: E402
+
+
+def make_tree(root):
+    (root / "shared" / "scripts").mkdir(parents=True)
+    (root / "shared" / "scripts" / "a.py").write_text("print(1)\n")
+    for s in sync_shared.TARGET_SKILLS:
+        (root / "skills" / s).mkdir(parents=True)
+
+
+def test_sync_and_check(tmp_path):
+    make_tree(tmp_path)
+    assert sync_shared.check(tmp_path)  # 아직 사본 없음
+    sync_shared.sync(tmp_path)
+    assert sync_shared.check(tmp_path) == []
+    (tmp_path / "shared" / "scripts" / "a.py").write_text("print(2)\n")
+    assert any(d.endswith("scripts/a.py") for d in sync_shared.check(tmp_path))
+
+
+def test_repo_copies_in_sync():
+    assert sync_shared.check(ROOT) == [], "python3 tools/sync_shared.py 를 실행할 것"
+
+
+def test_plugin_manifests():
+    plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
+    market = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text())
+    assert plugin["name"] == "pro-judge"
+    assert market["plugins"][0]["name"] == "pro-judge" and market["plugins"][0]["source"] == "./"
+    hooks = json.loads((ROOT / "hooks" / "hooks.json").read_text())
+    assert "SessionStart" in hooks["hooks"]
+
+
+def run_hook(project_dir):
+    env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT), "CLAUDE_PROJECT_DIR": str(project_dir)}
+    return subprocess.run(["bash", str(ROOT / "hooks" / "session-start.sh")],
+                          capture_output=True, text=True, env=env, check=True).stdout
+
+
+def test_hook_silent_without_contest(tmp_path):
+    assert run_hook(tmp_path) == ""
+
+
+def test_hook_injects_guide(tmp_path):
+    (tmp_path / "docs" / "pro-judge").mkdir(parents=True)
+    out = json.loads(run_hook(tmp_path))
+    ctx = out["hookSpecificOutput"]["additionalContext"]
+    assert out["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert "pro-judge 길잡이" in ctx

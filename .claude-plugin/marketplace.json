@@ -1,0 +1,11 @@
+{
+  "name": "pro-judge",
+  "owner": { "name": "Cassiiopeia" },
+  "plugins": [
+    {
+      "name": "pro-judge",
+      "source": "./",
+      "description": "대회 심사위원 하네스 — 등록·아이디어 비교·채점·질의응답 연습"
+    }
+  ]
+}
