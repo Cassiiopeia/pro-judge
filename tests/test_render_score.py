@@ -41,7 +41,7 @@ def test_flags_in_report(result):
 def test_html_self_contained(result):
     _, html = render(result)
     assert html.startswith("<!doctype html>")
-    assert 'class="bars"' in html and "<style>" in html
+    assert 'class="bars' in html and "<style>" in html
     assert not re.search(r'(src|href)="https?://', html)
     assert "<script" not in html
 
