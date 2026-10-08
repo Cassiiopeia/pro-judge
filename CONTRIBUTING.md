@@ -77,5 +77,5 @@ python3 shared/scripts/render_dashboard.py $X
 
 ## 신고
 
-보안 문제(예: 채점 대상 파일로 임의 명령이 실행되는 경우)는 재현 방법을 공개 이슈에 쓰지 않는다.
-제목을 `[보안] 연락 요청`으로 한 이슈만 열면 관리자가 비공개로 연락한다.
+보안 문제(예: 채점 대상 파일로 임의 명령이 실행되는 경우)는 공개 이슈에 쓰지 않고 GitHub의
+[비공개 취약점 신고](https://github.com/Cassiiopeia/pro-judge/security/advisories/new)로 알려 준다.

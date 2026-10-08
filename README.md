@@ -10,6 +10,11 @@
   <img src="assets/report-desktop.png" alt="채점 보고서 화면 — 총점, 항목별 막대, 고칠 것 순위" width="720">
 </p>
 
+<details>
+<summary>보고서 전체 훑어보기 (GIF, 4MB)</summary>
+<p align="center"><img src="assets/report-tour.gif" alt="채점 보고서를 위에서 아래로 훑는 화면 — 총점, 고칠 것 순위, 편차 경보, 심사위원별 총평" width="640"></p>
+</details>
+
 > 위 화면은 이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다.
 > 전체 보고서: [`examples/공개SW-개발자대회/`](examples/공개SW-개발자대회/runs/20261008-0957_score/report.md)
 
