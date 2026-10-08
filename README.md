@@ -69,6 +69,6 @@ Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiop
 ---
 
 <!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
-## 최신 버전 : v0.4.3 (2026-10-08)
+## 최신 버전 : v0.5.0 (2026-10-08)
 
 [전체 버전 기록 보기](CHANGELOG.md)
