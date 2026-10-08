@@ -1,0 +1,67 @@
+{
+  "persona": "community-lead",
+  "model": "sonnet",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 4,
+      "items": {
+        "code-structure": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "모듈별 책임을 한 문장으로 적은 구조 문서와, 복사된 코드가 없다는 근거가 원문에 있으면 7점 이상이 됩니다."
+        },
+        "code-completeness": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "테스트 통과 수와 CI 결과, 시연 영상이 원문에 있으면 7점 이상이 됩니다. 지금은 CI 워크플로우가 없고 통과 수 기록도 없습니다."
+        },
+        "doc-specificity": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "설계 문서나 구조도가 원문에 있으면 7점 이상이 됩니다. README에는 설치와 사용 명령이 있습니다. 그러나 설계 문서는 보이지 않습니다."
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "기술적 난점 2개 이상을 문서로 설명하고 그 부분의 테스트를 가리키면 7점 이상이 됩니다."
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 넘습니다. 문제 규모와 결과 숫자, 시연 화면이 있으면 10점에 가까워집니다."
+        },
+        "oss-usage": {
+          "score": 1,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘습니다. 의존성 라이선스 목록이 더해지면 10점이 됩니다. 설치 명령은 README에 있습니다."
+        },
+        "originality": {
+          "score": 1,
+          "quotes": [],
+          "cap_applied": "no-specifics",
+          "unlock_hint": "비슷한 기존 도구 2개 이상을 이름으로 비교하고, 차별 기능이 코드에서 확인되면 7점 이상이 됩니다. README에는 비교 대상 이름이 없습니다."
+        },
+        "community-potential": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "LICENSE와 CONTRIBUTING, 이슈 템플릿이 있어야 합니다. 대회 기간 전체에 걸친 커밋 이력(지금은 작성자 1명, 16개 모두 하루), 외부 기여자와 이슈 숫자, 담당과 기간이 있는 유지 계획이 있어야 점수가 오릅니다."
+        },
+        "demo": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "시연 영상(3분) 또는 단계별 시연 시나리오가 제출돼야 넘습니다. 핵심 기능 전부를 실제 입력으로 시연하고 같은 절차로 재현되면 10점입니다."
+        }
+      },
+      "summary": "LICENSE가 없습니다. 이 파일 어디 있나요? CONTRIBUTING과 이슈 템플릿도 없습니다. 커밋 작성자는 1명이고 16개가 모두 2026-10-08입니다. 그래서 커뮤니티 항목은 0점이고 활용성은 1점입니다. 발표자료와 시연 영상, 배포 주소도 없어서 발표와 데모는 0점입니다. 구조와 문서는 중간 수준입니다. 이슈 한 건 없이 대회 뒤 누가 답할지도 적혀 있지 않아, 지금은 공개된 코드일 뿐 오픈소스 프로젝트로 보기 어렵습니다."
+    }
+  ]
+}

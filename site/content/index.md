@@ -2,11 +2,11 @@
 layout: home
 
 hero:
-  name: pro-judge
+  name: PRO-Judge
   text: 내기 전에, 그 대회 심사위원에게 먼저
   image:
     src: /assets/report-mobile.png
-    alt: pro-judge 채점 보고서 모바일 화면
+    alt: PRO-Judge 채점 보고서 모바일 화면
   tagline: 공고와 심사기준을 주면 에이전트가 심사위원이 되어 내 자료를 채점하고, 어디를 고치면 몇 점이 오르는지 순서대로 알려 준다.
   actions:
     - theme: brand
@@ -38,9 +38,10 @@ features:
 
 ## 이런 보고서가 나온다
 
-![채점 보고서 — 총점, 항목별 막대, 고칠 것 순위](/assets/report-desktop.png)
+<video src="/assets/report-tour.mp4" autoplay muted loop playsinline poster="/assets/report-desktop.png" style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
 
-이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다. <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-0957_score/report.html" target="_blank">전체 보고서 열기 →</a>
+이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다. 첫 구현 시점 24.2점, 첫 보고서가 짚은 것을 고친 v0.4.3에서 54.3점.
+<a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1850_score/report.html" target="_blank">보고서 열기 →</a> · <a href="/pro-judge/examples/공개SW-개발자대회/index.html" target="_blank">대시보드 →</a>
 
 ## 설치는 한 줄
 

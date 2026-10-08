@@ -101,3 +101,13 @@ def test_dashboard_trend(contest_dir):
     hero = re.search(r'<section class="hero[^"]*">(.*?)</section>', html, re.S).group(1)
     assert "62.0" in hero and "+9.3" in hero
     assert "PRO-Judge" in html
+
+
+def test_overall_right_after_total_and_appendix_folded(result):
+    # 총평은 한 문단 요약이라 맨 아래가 아니라 총점 바로 아래에서 읽혀야 한다
+    md, html = render(result)
+    assert md.index("## 총평") < md.index("## 항목별 점수")
+    # 부록·항목별 근거는 길어서 기본으로 접는다 — md에서는 그대로 펼친다
+    assert re.search(r'<details class="fold"><summary>부록</summary>', html)
+    assert re.search(r'<details class="fold"><summary>항목별 근거</summary>', html)
+    assert "## 부록" in md and "## 항목별 근거" in md

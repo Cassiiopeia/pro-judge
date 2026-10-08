@@ -1,0 +1,79 @@
+{
+  "persona": "academic",
+  "model": "opus",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 4,
+      "items": {
+        "code-structure": {
+          "score": 6,
+          "quotes": [
+            "`skills/*/shared/`는 생성물이다. 직접 고치지 말고 `shared/`를 고친다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": "공통 코드를 skill마다 복사하지 않고 한 곳에서 참조하거나, 복사 방식을 택한 이유와 버린 대안을 문서로 밝히면 7점 이상을 검토한다"
+        },
+        "code-completeness": {
+          "score": 5,
+          "quotes": [
+            "python3 -m pytest              # 테스트"
+          ],
+          "cap_applied": null,
+          "unlock_hint": "테스트 N개 통과 결과(숫자)와 시연 영상이 원문에 있어야 7점 이상이 된다"
+        },
+        "doc-specificity": {
+          "score": 6,
+          "quotes": [
+            "python3 $SKILL/shared/scripts/aggregate.py <런 폴더> --target \"<대상 한 줄 설명>\""
+          ],
+          "cap_applied": null,
+          "unlock_hint": "설계 문서에 구조도와 '이 설계를 고른 이유·버린 대안'이 있어야 7점 이상이 된다"
+        },
+        "project-level": {
+          "score": 6,
+          "quotes": [
+            "같은 입력이면 같은 숫자가 나와야 하므로 점수 계산은 전부 여기서 한다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": "기술적 난점 2개 이상(인용 원문 대조, 상한 강제 등)을 문서에서 설명하고 그 부분의 테스트 결과를 숫자로 제시해야 7점 이상이 된다"
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 넘는다"
+        },
+        "oss-usage": {
+          "score": 4,
+          "quotes": [
+            "npx skills add Cassiiopeia/pro-judge"
+          ],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)이 있어야 넘는다"
+        },
+        "originality": {
+          "score": 3,
+          "quotes": [
+            "한 줄짜리 기준도 판정 질문·0/5/10 앵커·상한 규칙을 갖춘 점수표로 펼치고,"
+          ],
+          "cap_applied": null,
+          "unlock_hint": "비슷한 기존 도구 2개 이상을 이름으로 들어 비교표를 두고, 차별 기능이 코드에서 확인돼야 한다"
+        },
+        "community-potential": {
+          "score": 1,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "LICENSE 파일, CONTRIBUTING 문서나 이슈 템플릿, 대회 기간 전체에 걸친 커밋 이력이 있어야 넘는다"
+        },
+        "demo": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "시연 영상(3분) 또는 단계별 시연 시나리오가 제출돼야 넘는다"
+        }
+      },
+      "summary": "총점은 낮습니다. 독창성 15점 항목에서 비교한 기존 도구 이름이 하나도 없고, 설계 이유·대안 비교·정량 평가 숫자가 문서에 없습니다. LICENSE가 없어 공개SW 활용성과 커뮤니티 항목이 상한에 걸리며, 커밋 16개가 모두 2026-10-08 하루, 작성자 1명이고 발표자료·시연 영상도 없습니다."
+    }
+  ]
+}

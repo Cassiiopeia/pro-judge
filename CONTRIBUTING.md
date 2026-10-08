@@ -60,8 +60,7 @@ python3 tools/sync_shared.py
 
 ```bash
 X=examples/공개SW-개발자대회
-python3 shared/scripts/render_report.py $X/runs/20261008-0957_score
-python3 shared/scripts/render_report.py $X/runs/20261008-1000_grill
+for r in $X/runs/*/; do python3 shared/scripts/render_report.py "$r"; done
 python3 shared/scripts/render_dashboard.py $X
 ```
 

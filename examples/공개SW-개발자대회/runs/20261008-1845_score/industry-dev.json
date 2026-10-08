@@ -1,0 +1,67 @@
+{
+  "persona": "industry-dev",
+  "model": "sonnet",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 6,
+      "items": {
+        "code-structure": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "code-completeness": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "doc-specificity": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "project-level": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "presentation": {
+          "score": 0,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출되고 문제 규모·결과 숫자가 있어야 넘는다"
+        },
+        "oss-usage": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "레포 루트에 OSI 승인 라이선스 파일(LICENSE)과 의존성(PyYAML) 라이선스 목록이 있어야 넘는다"
+        },
+        "originality": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": null,
+          "unlock_hint": "기존 도구 2개 이상을 이름으로 비교하고 차별 기능이 코드에서 확인되면 10점에 가까워진다"
+        },
+        "community-potential": {
+          "score": 1,
+          "quotes": [],
+          "cap_applied": "no-license",
+          "unlock_hint": "LICENSE, CONTRIBUTING 또는 이슈 템플릿이 있고 외부 기여자·외부 이슈 숫자가 확인되어야 넘는다"
+        },
+        "demo": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "시연 영상(3분) 또는 단계별 시연 시나리오가 제출되어야 넘는다"
+        }
+      },
+      "summary": "총점은 낮습니다. 시연 영상·발표자료·LICENSE·CONTRIBUTING이 없고, 테스트 통과 수와 CI 결과도 원문에 없습니다. README에 설치·실행 명령과 테스트 명령(python3 -m pytest)은 있지만 돌려 본 숫자가 없어 5점입니다. 테스트 통과 수, 시연 영상, LICENSE가 있으면 각각 7점 이상이 됩니다."
+    }
+  ]
+}

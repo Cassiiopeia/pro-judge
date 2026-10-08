@@ -112,6 +112,9 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
           "top_fix": fixes[0] if fixes else None},
          {"type": "notice", "label": f"이 점수 읽는 법 · 확인할 것 {len(notices)}건", "items": notices}]
 
+    nar = _narrative(r)
+    b += [{"type": "h2", "text": "총평"}, {"type": "p", "text": nar.get("overall") or "(총평 없음)"}]
+
     b += [{"type": "h2", "text": "항목별 점수"},
           {"type": "bars", "scale": True,
            "rows": [{"label": i["name"], "value": i["earned"], "max": i["points_total"]} for i in r["items"]]}]
@@ -133,22 +136,20 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
           {"type": "h2", "text": "공통 약점 (모델 2종 이상, 전원 5점 이하)"},
           {"type": "list", "items": [names[iid] for iid in r["consensus_gaps"]]}]
 
-    b += [{"type": "h2", "text": "항목별 근거"},
+    b += [{"type": "fold", "label": "항목별 근거", "blocks": [
           {"type": "table", "headers": ["항목", "득점 / 배점", "심사위원별", "상한", "인용", "변화"],
            "rows": [[i["name"], f"{i['earned']:g} / {i['points_total']:g}",
                      ", ".join(f"{_who(labels, p)} {s:g}" for p, s in i["by_persona"].items()),
                      ", ".join(i["caps"]) or "-", " / ".join(i["quotes"]) or "(인용 없음)", _fmt_delta(i["delta"])]
-                    for i in r["items"]]}]
+                    for i in r["items"]]}]}]
 
-    nar = _narrative(r)
-    b += [{"type": "h2", "text": "총평"}, {"type": "p", "text": nar.get("overall") or "(총평 없음)"},
-          {"type": "h2", "text": "심사위원별 총평"},
+    b += [{"type": "h2", "text": "심사위원별 총평"},
           {"type": "cards", "items": [{"title": _who(labels, p["name"]),
                                        "sub": f"{', '.join(p['groups'])} · {p['model'] or '모델 미기록'}",
                                        "text": (nar.get("personas") or {}).get(p["name"]) or p["summary"] or "-"}
                                       for p in r["personas"]]}]
 
-    b += [{"type": "h2", "text": "부록"},
+    b += [{"type": "fold", "label": "부록", "blocks": [
           {"type": "p", "text": "추정(inferred) 규칙 — 공고에 없어 에이전트가 정한 것"},
           {"type": "list", "items": r["inferred_rules"]},
           {"type": "p", "text": "실행 정보"},
@@ -156,7 +157,7 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
                                      for p in r["personas"]]
                                     + [f"제외 {n}: {'; '.join(e[:3])}" for n, e in r["failed"].items()]},
           {"type": "p", "text": "경고"},
-          {"type": "list", "items": r["warnings"]}]
+          {"type": "list", "items": r["warnings"]}]}]
     return b
 
 

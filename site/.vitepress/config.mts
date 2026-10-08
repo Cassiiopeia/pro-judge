@@ -16,7 +16,7 @@ const GITHUB = 'https://github.com/Cassiiopeia/pro-judge'
 
 // 흐름도는 mermaid 코드 블록으로 쓴다 — GitHub 이슈·보고서와 같은 문법
 export default withMermaid(defineConfig({
-  title: 'pro-judge',
+  title: 'PRO-Judge',
   description: '대회에 내기 전에 그 대회의 심사위원에게 먼저 채점받는다',
   lang: 'ko',
   base: '/pro-judge/',
@@ -31,7 +31,7 @@ export default withMermaid(defineConfig({
   head: [
     ['meta', { name: 'theme-color', content: '#b4232a' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'pro-judge — 내기 전에, 그 대회 심사위원에게 먼저' }],
+    ['meta', { property: 'og:title', content: 'PRO-Judge — 내기 전에, 그 대회 심사위원에게 먼저' }],
     ['meta', { property: 'og:description', content: '공고와 심사기준으로 심사위원을 만들어 내 자료를 채점하고, 어디를 고치면 몇 점이 오르는지 알려 주는 Agent Skills' }],
     ['meta', { property: 'og:image', content: 'https://cassiiopeia.github.io/pro-judge/assets/report-desktop.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],

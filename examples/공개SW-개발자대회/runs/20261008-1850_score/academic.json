@@ -1,0 +1,85 @@
+{
+  "persona": "academic",
+  "model": "opus",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 7,
+      "items": {
+        "code-structure": {
+          "score": 7,
+          "quotes": [
+            "`skills/*/shared/`는 `shared/`의 사본이다. `npx skills`가 skill 폴더 하나만 복사하기 때문에 사본을 커밋한다.",
+            "사본을 직접 고치거나 sync를 빠뜨리면 `test_repo_copies_in_sync`가 실패한다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "code-completeness": {
+          "score": 6,
+          "quotes": [
+            "python3 -m pytest                    # 모두 통과해야 PR을 받는다"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "doc-specificity": {
+          "score": 8,
+          "quotes": [
+            "판단은 에이전트가, 숫자는 스크립트가 맡는다. 에이전트가 규칙을 어겨도 합산 단계에서 강제로 맞춰진다.",
+            "| 상한 강제 | 신고된 상한보다 높은 점수는 상한으로 내린다. 확인 불가는 시연 실패와 같은 4점 — 데모를 숨기는 편이 유리하지 않게 |"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "project-level": {
+          "score": 7,
+          "quotes": [
+            "수상팀이 미수상팀보다 높게 나온 쌍 **29 / 36** (한 줄 프롬프트 26 / 36)",
+            "틀린 쌍도 있다. fork한 저장소(Zephyr 금상작)는 팀 기여분이 안 보여 최하위로 나왔다 — 이 발견으로 `repo_facts.py`가 원본 대비 팀 커밋을 따로 세게 됐다"
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "presentation": {
+          "score": 3,
+          "quotes": [],
+          "cap_applied": "no-deck",
+          "unlock_hint": "발표자료(PPT/PDF) 또는 발표 영상이 제출돼야 넘는다. 문제 규모·결과 숫자(29/36 등)와 시연 화면이 들어간 자료가 있으면 10점 기준에 닿는다"
+        },
+        "oss-usage": {
+          "score": 8,
+          "quotes": [
+            "PyMuPDF(AGPL-3.0)·poppler(GPL)를 skill 폴더에 넣거나 함께 배포하지 않는다 — 사용자가 고른 도구를 설치해 쓰게 둔다.",
+            "Python 3.9 이상. 새 외부 의존성은 넣지 않는다 — PyYAML 하나만 필수다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "originality": {
+          "score": 8,
+          "quotes": [
+            "promptfoo와 DeepEval은 LLM 애플리케이션의 출력을 테스트하는 범용 평가 프레임워크다. 기준 하나로 통과·실패와 점수를 낸다.",
+            "| 근거 확인 | 없음 | 없음 | 없음 | **인용을 원문과 대조**, 없는 인용은 삭제 |",
+            "에이전트가 상한·인용 규칙을 어겨도 여기서 강제로 맞춘다."
+          ],
+          "cap_applied": null,
+          "unlock_hint": null
+        },
+        "community-potential": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": "last-minute-commits",
+          "unlock_hint": "커밋 73개가 모두 2026-10-08 하루에 있다. 대회 기간 전체에 걸친 커밋 이력, 외부 기여자·외부 이슈 수, 대회 뒤 유지 담당과 기간이 원문에 있어야 넘는다"
+        },
+        "demo": {
+          "score": 5,
+          "quotes": [],
+          "cap_applied": "no-demo-material",
+          "unlock_hint": "3분 시연 영상 또는 실제 입력→예제 보고서까지 같은 절차로 재현되는 단계별 시연 시나리오가 제출돼야 넘는다"
+        }
+      },
+      "summary": "독창성 8점: promptfoo·DeepEval·한 줄 프롬프트를 이름으로 비교하고 인용 대조가 aggregate.py에 구현돼 있으나, 비교 도구와의 정량 비교는 없고 한 줄 프롬프트 대비 29 vs 26/36은 12팀 표본이라 근거로서 약합니다. 설계 문서는 작동 방식·합산 규칙의 이유를 적어 8점이지만 버린 대안은 적혀 있지 않습니다. 발표자료(3점)·시연 영상(5점)이 없고 커밋 73개가 하루에 몰려 있으며 외부 기여자 0명이라 커뮤니티 5점입니다."
+    }
+  ]
+}

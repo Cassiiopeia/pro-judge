@@ -99,6 +99,9 @@ def to_markdown(blocks: list) -> str:
                                  + f": {_md_line(c['text'])}" for c in b["items"]) or "- (없음)")
         elif t == "qa":
             out.append(_md_table(QA_HEADERS[b["mode"]], [_qa_row(q, b["mode"]) for q in b["items"]]))
+        elif t == "fold":
+            # md는 접을 수 없으니 제목을 달아 그대로 펼친다
+            out.append(f"## {_md_line(b['label'])}\n\n" + to_markdown(b["blocks"]).rstrip("\n"))
         else:
             raise ValueError(f"모르는 블록 {t}")
     return "\n\n".join(out) + "\n"
@@ -150,11 +153,11 @@ background:radial-gradient(closest-side,var(--card) 79%,transparent 80% 100%),co
 .table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
 table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
 tr:last-child td{border-bottom:0}th{color:var(--muted);font-weight:600;font-size:13px;white-space:nowrap}a{color:var(--brand)}
-ul.plain{padding-left:20px}footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+ul.plain{padding-left:20px}.fold{margin:28px 0 0}.fold>summary{cursor:pointer;font-size:18px;font-weight:700;padding:10px 0;border-top:1px solid var(--line)}.fold>summary::marker{color:var(--brand)}footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
 @media (max-width:560px){h1{font-size:22px}.hero{grid-template-columns:1fr;justify-items:center;text-align:center;padding:20px}
 .hero-sub{text-align:center}.top-fix{text-align:left;width:100%}.bar-row{grid-template-columns:minmax(0,1fr) 5.5em;row-gap:4px}
 .bar-row .track{grid-column:1/-1;grid-row:2}.fix{grid-template-columns:2.2em minmax(0,1fr)}.fix .gain{grid-column:2}.q.follow{margin-left:12px}}
-@media print{body{background:#fff}.hero,.panel,.fix,.card,.q,.table-wrap{box-shadow:none;break-inside:avoid}.notice{display:block}details.notice>*{display:block}
+@media print{body{background:#fff}.hero,.panel,.fix,.card,.q,.table-wrap{box-shadow:none;break-inside:avoid}.notice{display:block}details>*{display:block}
 main{max-width:none;padding:0}h2{break-after:avoid}}
 """
 
@@ -221,8 +224,8 @@ def _qa_html(b: dict) -> str:
     return "".join(parts) if b["items"] else "<p>(없음)</p>"
 
 
-def to_html(blocks: list, title: str, footer: str = "") -> str:
-    body = [f'<p class="brand">{BRAND}</p>']
+def _blocks_html(blocks: list) -> list:
+    body = []
     for b in blocks:
         t = b["type"]
         if t in ("h1", "h2"):
@@ -262,8 +265,17 @@ def to_html(blocks: list, title: str, footer: str = "") -> str:
                 + f'<div>{escape(str(c["text"]))}</div></div>' for c in b["items"]) + "</div>")
         elif t == "qa":
             body.append(_qa_html(b))
+        elif t == "fold":
+            # 길지만 가끔만 보는 절(부록·근거 표) — 첫 화면 스크롤을 줄이려고 접어 둔다
+            body.append(f'<details class="fold"><summary>{escape(str(b["label"]))}</summary>'
+                        + "".join(_blocks_html(b["blocks"])) + "</details>")
         else:
             raise ValueError(f"모르는 블록 {t}")
+    return body
+
+
+def to_html(blocks: list, title: str, footer: str = "") -> str:
+    body = [f'<p class="brand">{BRAND}</p>', *_blocks_html(blocks)]
     foot = f"<footer>{BRAND}로 만든 보고서" + (f" · {escape(footer)}" if footer else "") + "</footer>"
     return ("<!doctype html>\n<html lang=\"ko\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"

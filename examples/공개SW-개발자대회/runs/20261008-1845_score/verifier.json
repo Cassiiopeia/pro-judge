@@ -1,0 +1,19 @@
+{
+  "persona": "verifier",
+  "model": "haiku",
+  "independent": true,
+  "runs": [
+    {
+      "gate_score": 5,
+      "items": {
+        "function-test": {
+          "score": 4,
+          "quotes": [],
+          "cap_applied": "claim-not-verified",
+          "unlock_hint": "테스트 실행 결과(통과 수·실패 수)와 README에 적힌 명시 기능별 실행 결과가 원문에 있어야 4점을 넘는다. 원문 target에는 실행 결과가 없고 테스트 파일 수(20개)만 있다."
+        }
+      },
+      "summary": "기능테스트 항목은 실행 결과가 원문에 없어 확인하지 못했습니다. 이 회차는 코드·테스트를 실행하지 않았고, 원문에는 테스트 파일 20개와 README의 실행 명령(python3 -m pytest)만 있습니다. 확인 불가 대상이므로 claim-not-verified 상한 4점을 적용합니다."
+    }
+  ]
+}
