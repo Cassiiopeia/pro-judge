@@ -41,13 +41,31 @@ def _upstream_section(repo: Path, upstream: str) -> list:
         else:
             _git(repo, "remote", "add", UPSTREAM_REMOTE, upstream, check=True)
         _git(repo, "fetch", "-q", "--filter=blob:none", UPSTREAM_REMOTE, "HEAD", check=True)
-        log = _git(repo, "log", "FETCH_HEAD..HEAD", "--format=%ad|%an", "--date=short", check=True)
+        # fork의 기본 브랜치는 원본과 같고 팀 작업은 별도 브랜치에 있는 경우가 많다(실측: tsnlab/zephyr) — 모든 브랜치를 본다
+        refs = ["HEAD", "--branches", f"--remotes=origin"]
+        log = _git(repo, "log", *refs, "--not", "FETCH_HEAD", "--format=%ad|%an", "--date=short", check=True)
+        branches = []
+        for ref in _git(repo, "for-each-ref", "--format=%(refname:short)", "refs/remotes/origin", "refs/heads").split():
+            if ref.endswith("/HEAD"):
+                continue
+            n = int(_git(repo, "rev-list", "--count", ref, "--not", "FETCH_HEAD").strip() or 0)
+            if n:
+                branches.append((ref.split("/", 1)[1] if ref.startswith("origin/") else ref, n))
     except RuntimeError as e:
         return [f"- fork 원본 비교 실패: {e}"]
     authors = _authors(log)
     total = sum(authors.values())
-    return [f"- 원본 대비 팀 커밋 {total}개, 작성자 {len(authors)}명: "
-            + ", ".join(f"{a} {c}" for a, c in authors.most_common(8)) + f" (원본: {upstream})"]
+    out = [f"- 원본 대비 팀 커밋 {total}개, 작성자 {len(authors)}명: "
+           + ", ".join(f"{a} {c}" for a, c in authors.most_common(8)) + f" (원본: {upstream})"]
+    if branches:
+        # 같은 이름의 로컬·원격 브랜치는 한 번만 보여 준다
+        seen = {}
+        for name, n in branches:
+            seen[name] = max(n, seen.get(name, 0))
+        top = sorted(seen.items(), key=lambda x: -x[1])[:10]
+        out.append(f"- 팀 커밋이 있는 브랜치 {len(seen)}개: " + ", ".join(f"{b} {n}" for b, n in top))
+        out.append("  (브랜치가 원본의 옛 지점에서 갈라졌으면 원본 HEAD에 없는 원본 커밋도 섞인다 — 작성자 목록에서 팀원만 골라 읽는다)")
+    return out
 
 
 def facts(repo, since=None, until=None, upstream=None) -> str:
