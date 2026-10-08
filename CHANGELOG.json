@@ -1,14 +1,34 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T03:11:07Z",
-    "currentVersion": "0.2.1",
+    "lastUpdated": "2026-10-08T03:16:43Z",
+    "currentVersion": "0.2.2",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 3
+    "totalReleases": 4
   },
   "releases": [
+    {
+      "version": "0.2.2",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 18,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **문서**\n  * 보고서 전체를 훑어보는 화면을 추가했습니다\n  * 보안 문제를 비공개로 신고하는 방법을 안내합니다",
+      "parsed_changes": {
+        "문서": {
+          "title": "문서",
+          "items": [
+            "보고서 전체를 훑어보는 화면을 추가했습니다",
+            "보안 문제를 비공개로 신고하는 방법을 안내합니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.2.1",
       "project_type": "basic",
