@@ -43,6 +43,13 @@ features:
 이 레포를 「제10회 공개SW 개발자대회」 심사기준으로 채점한 실제 결과다. 첫 구현 시점 24.2점, 첫 보고서가 짚은 것을 고친 v0.4.3에서 54.3점.
 <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1850_score/report.html" target="_blank">보고서 열기 →</a> · <a href="/pro-judge/examples/공개SW-개발자대회/index.html" target="_blank">대시보드 →</a>
 
+## 대화로 쓴다
+
+<video src="/assets/conversation-demo.mp4" controls muted playsinline poster="/assets/conversation-demo.png" style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
+
+Claude Code에서 실제로 주고받은 2분이다(편집 없음). 지난 채점 결과를 요약하고, 가장 약한 항목(기능테스트)으로 질의응답을 연습한다.
+심사위원은 답에 새 숫자가 있으면 `up`으로 판정하고, 자료의 테스트 함수 수(147)와 답한 통과 수(160)가 다른 것까지 짚어 꼬리 질문을 던진다.
+
 ## 설치는 한 줄
 
 ```bash

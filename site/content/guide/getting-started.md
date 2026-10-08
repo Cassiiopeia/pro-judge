@@ -45,6 +45,8 @@ npx skills add Cassiiopeia/pro-judge -g       # 모든 프로젝트
 
 ## 처음 쓰기
 
+<video src="/assets/conversation-demo.mp4" controls muted playsinline poster="/assets/conversation-demo.png" style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
+
 명령어를 외울 필요는 없다. 심사받을 레포에서 에이전트에게 말로 시킨다.
 
 ### 1. 대회 등록
