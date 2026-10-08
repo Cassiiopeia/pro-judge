@@ -75,3 +75,22 @@ def test_cli_writes_out(repo, tmp_path):
     out = tmp_path / "run" / "target" / "team.txt"
     assert rf.main([str(repo), "--out", str(out)]) == 0
     assert "전체 커밋 4개" in out.read_text(encoding="utf-8")
+
+
+def test_fork_team_work_on_other_branches(tmp_path):
+    # 실측(tsnlab/zephyr): 기본 브랜치는 원본과 같고 팀 작업은 별도 브랜치 수십 개에 있다 — HEAD만 비교하면 0개가 된다
+    up = tmp_path / "upstream"
+    up.mkdir()
+    git(up, "init", "-q", "-b", "main")
+    commit(up, "core.c", "x", "2025-06-01T10:00:00", author="Upstream")
+    team_remote = tmp_path / "team-remote"
+    subprocess.run(["git", "clone", "-q", str(up), str(team_remote)], check=True)
+    git(team_remote, "checkout", "-q", "-b", "rpi5-port")
+    for n in range(3):
+        commit(team_remote, f"port{n}.c", "y", f"2025-08-0{n + 1}T10:00:00", author="Team")
+    git(team_remote, "checkout", "-q", "main")
+    fork = tmp_path / "fork"
+    subprocess.run(["git", "clone", "-q", str(team_remote), str(fork)], check=True)
+    text = rf.facts(fork, upstream=str(up))
+    assert "원본 대비 팀 커밋 3개" in text and "Team 3" in text
+    assert "rpi5-port 3" in text  # 어느 브랜치에 팀 작업이 있는지
