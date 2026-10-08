@@ -1,14 +1,47 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T02:45:14Z",
-    "currentVersion": "0.1.1",
+    "lastUpdated": "2026-10-08T03:07:22Z",
+    "currentVersion": "0.2.0",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 1
+    "totalReleases": 2
   },
   "releases": [
+    {
+      "version": "0.2.0",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 12,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **새 기능**\n  * PDF·PPTX·Word 발표자료에서 글을 자동으로 뽑아 채점합니다\n  * 슬라이드가 그림인 쪽도 글자를 읽어 냅니다(macOS·Windows 내장 기능)\n  * 앱 화면·도표·색 대비는 쪽 이미지를 직접 보고 판단합니다\n\n* **버그 수정**\n  * 일부 쪽이 깨진 PDF도 끝까지 읽습니다\n\n* **문서**\n  * 실제 대회 수상 결과로 검증한 결과와 한계를 공개했습니다",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "PDF·PPTX·Word 발표자료에서 글을 자동으로 뽑아 채점합니다",
+            "슬라이드가 그림인 쪽도 글자를 읽어 냅니다(macOS·Windows 내장 기능)",
+            "앱 화면·도표·색 대비는 쪽 이미지를 직접 보고 판단합니다"
+          ]
+        },
+        "버그_수정": {
+          "title": "버그 수정",
+          "items": [
+            "일부 쪽이 깨진 PDF도 끝까지 읽습니다"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "실제 대회 수상 결과로 검증한 결과와 한계를 공개했습니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.1.1",
       "project_type": "basic",
