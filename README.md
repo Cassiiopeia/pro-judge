@@ -7,9 +7,7 @@
 대회 취지에 맞춘 심사위원 페르소나를 만들어 아이디어·발표자료·레포·배포 서비스를 채점한다.
 날카로운 질문으로 질의응답을 연습시키고, 결과를 md·html 보고서로 낸다.
 
-> 상태: 개발 중
-
-## 구성 (예정)
+## 구성
 
 | skill | 하는 일 |
 | --- | --- |
@@ -19,8 +17,39 @@
 | `pro-judge-score` | 자료 채점 — 페르소나별 독립 채점, 고칠 것 순위 |
 | `pro-judge-grill` | 질의응답 연습 — 약한 곳을 찌르는 질문과 답변 판정 |
 
-## 설치 (예정)
+## 설치
+
+필요: Python 3.9+, PyYAML (`python3 -m pip install pyyaml`)
+
+Claude Code·Codex·Cursor 등 ([vercel-labs/skills](https://github.com/vercel-labs/skills)):
 
 ```bash
 npx skills add Cassiiopeia/pro-judge
 ```
+
+Claude Code 플러그인(대회가 등록된 레포에서 길잡이 자동 로드):
+
+```
+/plugin marketplace add Cassiiopeia/pro-judge
+/plugin install pro-judge@pro-judge
+```
+
+## 사용
+
+```
+이 대회 나갈 거야 <공고 URL>
+아이디어 3개 중 뭐가 점수 잘 나와?
+발표자료 몇 점이야? ./slides.pdf
+질의응답 연습하자
+```
+
+대회 자료는 심사받는 레포의 `docs/pro-judge/<대회>/`에 쌓인다. 이 폴더는 기본으로 git에서 빠진다.
+
+## 개발
+
+```bash
+python3 -m pytest              # 테스트
+python3 tools/sync_shared.py   # shared/ 를 고친 뒤 각 skill로 복사
+```
+
+`skills/*/shared/`는 생성물이다. 직접 고치지 말고 `shared/`를 고친다.
