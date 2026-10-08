@@ -1,0 +1,43 @@
+/* 브랜드 색 — 심사표의 붉은 펜과 결재 도장에서 가져온 색 */
+:root {
+  --vp-c-brand-1: #b4232a;
+  --vp-c-brand-2: #d23a3a;
+  --vp-c-brand-3: #b4232a;
+  --vp-c-brand-soft: rgba(210, 58, 58, 0.12);
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #b4232a 20%, #e07a2e);
+}
+.dark {
+  --vp-c-brand-1: #f2706a;
+  --vp-c-brand-2: #f58f86;
+  --vp-c-brand-3: #f2706a;
+}
+
+/* 한국어는 단어 중간에서 줄바꿈하지 않는다 ("채점하/지" 방지) */
+html {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 코드 블록 안은 글자 단위로 줄바꿈하지 않도록 되돌린다 */
+pre, code {
+  word-break: normal;
+}
+
+/* 본문 화면 캡처·GIF 가 카드처럼 보이게 */
+.vp-doc img {
+  border-radius: 10px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* 표가 넓을 때 글자가 너무 촘촘해지지 않게 */
+.vp-doc table {
+  font-size: 0.92em;
+}
+
+/* 히어로 이미지는 휴대폰 화면 비율이라 높이를 제한하고 카드처럼 보이게 */
+.VPHero .image-src {
+  max-height: 360px;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}

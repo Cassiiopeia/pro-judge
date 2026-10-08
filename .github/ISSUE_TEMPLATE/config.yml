@@ -1,1 +1,5 @@
-iblank_issues_enabled: false
+blank_issues_enabled: false
+contact_links:
+  - name: 사용법·작동 방식 문서
+    url: https://cassiiopeia.github.io/pro-judge/
+    about: 설치·처음 쓰기·보고서 읽는 법
