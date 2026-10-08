@@ -1,14 +1,35 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T06:25:45Z",
-    "currentVersion": "0.4.2",
+    "lastUpdated": "2026-10-08T06:37:22Z",
+    "currentVersion": "0.4.3",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 10
+    "totalReleases": 11
   },
   "releases": [
+    {
+      "version": "0.4.3",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 36,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **문서**\n  * 플러그인 정보와 레포 소개에서 문서 사이트로 바로 갑니다\n  * 행동 강령과 질문 게시판(Discussions)을 열었습니다\n  * 사이트 링크를 공유하면 미리보기가 보입니다",
+      "parsed_changes": {
+        "문서": {
+          "title": "문서",
+          "items": [
+            "플러그인 정보와 레포 소개에서 문서 사이트로 바로 갑니다",
+            "행동 강령과 질문 게시판(Discussions)을 열었습니다",
+            "사이트 링크를 공유하면 미리보기가 보입니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.4.2",
       "project_type": "basic",
