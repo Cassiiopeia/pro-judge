@@ -21,7 +21,17 @@ def _fmt_delta(d) -> str:
 
 def _score_blocks(r: dict) -> list:
     b = [{"type": "h1", "text": f"{r['contest']} 채점 보고서"},
-         {"type": "p", "text": f"{r['created_at']} · 회차 {r['run'] or '-'} · 대상 {r['target'] or '-'}"}]
+         {"type": "p", "text": f"{r['created_at']} · 회차 {r['run'] or '-'} · 대상 {r['target'] or '-'}"},
+         # 숫자가 정밀해 보여도 실제 받을 점수의 예측이 아니다 — 매 보고서 맨 위에 못박는다
+         {"type": "callout", "label": "진단 지표",
+          "text": "이 점수는 아래 점수표로 잰 상대 진단이다. 실제 대회에서 받을 점수의 예측이 아니다. "
+                  "같은 점수표로 고치기 전후를 비교하는 데 쓴다."}]
+    if r.get("calibration"):
+        b.append({"type": "callout", "label": "보정용 채점",
+                  "text": "역대 수상작·낙선작을 점수표 검증용으로 채점한 회차다. 회차 비교와 추이에서 빠진다."})
+    if not r.get("quotes_verified"):
+        b.append({"type": "callout", "label": "인용 원문 대조 안 함",
+                  "text": "채점 대상 원문(target/)이 없어 인용이 실제 자료에 있는지 확인하지 못했다. 7점 이상 점수를 그대로 믿지 않는다."})
     if r["no_official_criteria"]:
         b.append({"type": "callout", "label": "공식 기준 없음",
                   "text": "모든 항목이 추정(inferred)이다. 점수는 참고용이다."})
@@ -42,7 +52,10 @@ def _score_blocks(r: dict) -> list:
 
     total = f"{r['total']:.1f} / 100"
     if r["total_range"]:
-        total += f" (범위 {r['total_range'][0]:.1f} ~ {r['total_range'][1]:.1f}, 추정 규칙 비중 {r['inferred_share']:.0%})"
+        total += (f" (추정 규칙 민감도 {r['total_range'][0]:.1f} ~ {r['total_range'][1]:.1f}: 추정 규칙이 걸린 항목을 ±1점 움직인 값,"
+                  f" 신뢰구간 아님 · 추정 규칙 비중 {r['inferred_share']:.0%})")
+    if g["multiplier"] < 1:
+        total += f" · 취지 배율 {g['multiplier']:g} 적용 전 {r['raw_total']:.1f}"
     if r["previous"]:
         total += f" · 지난 회차 {r['previous']['total']:.1f} 대비 {_fmt_delta(r['previous']['delta'])}"
     b += [{"type": "h2", "text": "총점"}, {"type": "p", "text": total},
@@ -50,15 +63,20 @@ def _score_blocks(r: dict) -> list:
                                     for i in r["items"]]}]
 
     b += [{"type": "h2", "text": "고칠 것 Top 5"},
-          {"type": "table", "headers": ["순위", "항목", "오를 수 있는 점수", "걸린 상한", "해제 조건"],
-           "rows": [[n, f["name"], f"{f['gain']:g}", ", ".join(f["caps"]) or "-", " / ".join(f["unlock_hints"]) or "-"]
+          {"type": "p", "text": "다음 앵커(5점 또는 10점) 수준까지 올렸을 때 오르는 총점 순서다. '다음 앵커' 문장이 자료에 생기게 만드는 것이 할 일이다."},
+          {"type": "table", "headers": ["순위", "항목", "현재 → 목표", "오르는 점수", "다음 앵커", "걸린 상한", "해제 조건"],
+           "rows": [[n, f["name"], f"{f.get('level', 0):.1f} → {f.get('next_anchor', '-')}", f"+{f['gain']:g}",
+                     f.get("next_anchor_text") or "-", ", ".join(f["caps"]) or "-", (f["unlock_hints"] or ["-"])[0]]
                     for n, f in enumerate(r["fix_priority"], 1)]}]
 
     names = {i["id"]: i["name"] for i in r["items"]}
     b += [{"type": "h2", "text": "편차 경보"},
           {"type": "list", "items": [f"{names[iid]}: 심사위원 사이 {next(i['spread'] for i in r['items'] if i['id'] == iid):g}점 차이"
                                      for iid in r["deviation_alerts"]]},
-          {"type": "h2", "text": "진짜 구멍 (다른 모델도 같은 지적)"},
+          {"type": "h2", "text": "회차마다 흔들린 항목"},
+          {"type": "list", "items": [f"{names[iid]}: 같은 심사위원 점수가 회차마다 {next(i.get('run_range', 0) for i in r['items'] if i['id'] == iid):g}점까지 달라짐 — 앵커가 모호하거나 근거가 애매하다"
+                                     for iid in r.get("instability_alerts", [])]},
+          {"type": "h2", "text": "공통 약점 (모델 2종 이상, 전원 5점 이하)"},
           {"type": "list", "items": [names[iid] for iid in r["consensus_gaps"]]}]
 
     b += [{"type": "h2", "text": "항목별"},
@@ -68,7 +86,7 @@ def _score_blocks(r: dict) -> list:
                      ", ".join(i["caps"]) or "-", " / ".join(i["quotes"]) or "(인용 없음)", _fmt_delta(i["delta"])]
                     for i in r["items"]]}]
 
-    nar = r.get("narrative") or {}
+    nar = _narrative(r)
     b += [{"type": "h2", "text": "총평"}, {"type": "p", "text": nar.get("overall") or "(총평 없음)"},
           {"type": "h2", "text": "심사위원별 총평"},
           {"type": "list", "items": [f"{p['name']} ({', '.join(p['groups'])}, {p['model'] or '모델 미기록'}): "
@@ -92,15 +110,48 @@ VERDICT_ORDER = {"down": 0, "same": 1}
 COST_LABEL = {"low": "낮음", "mid": "중간", "high": "높음"}
 
 
+def _narrative(r: dict) -> dict:
+    """에이전트가 손으로 채우는 칸이라 타입이 틀리기 쉽다 — traceback 대신 고칠 곳을 말한다."""
+    nar = r.get("narrative") or {}
+    if not isinstance(nar, dict):
+        raise InputError('result.json narrative: {"overall": "...", "personas": {...}} 객체여야 함')
+    if not isinstance(nar.get("overall") or "", str):
+        raise InputError("result.json narrative.overall: 문자열이어야 함")
+    if not isinstance(nar.get("personas") or {}, dict):
+        raise InputError("result.json narrative.personas: {이름: 총평} 객체여야 함")
+    return nar
+
+
 def validate_grill(r: dict) -> None:
     if r.get("mode") not in ("practice", "sheet"):
         raise InputError("grill result: mode는 practice/sheet")
-    for n, q in enumerate(r.get("questions") or []):
-        for qq in [q, *(q.get("follow_ups") or [])]:
+    for key in ("contest", "created_at"):
+        if not isinstance(r.get(key), str):
+            raise InputError(f"grill result: {key}가 문자열이어야 함")
+    questions = r.get("questions")
+    if not isinstance(questions, list):
+        raise InputError("grill result: questions가 목록이어야 함")
+    for n, q in enumerate(questions):
+        if not isinstance(q, dict):
+            raise InputError(f"grill result questions[{n}]: 객체여야 함 (grill-output.md 형식)")
+        for key in ("persona", "item"):
+            if not str(q.get(key) or "").strip():
+                raise InputError(f"grill result questions[{n}]: {key}가 비어 있음")
+        follow_ups = q.get("follow_ups") or []
+        if not isinstance(follow_ups, list) or not all(isinstance(f, dict) for f in follow_ups):
+            raise InputError(f"grill result questions[{n}].follow_ups: 객체 목록이어야 함")
+        for qq in [q, *follow_ups]:
             if qq.get("verdict") not in VERDICT_LABEL:
                 raise InputError(f"grill result questions[{n}]: verdict는 up/same/down/null")
             if not str(qq.get("question") or "").strip():
                 raise InputError(f"grill result questions[{n}]: question이 비어 있음")
+    suggestions = r.get("suggestions") or []
+    if not isinstance(suggestions, list):
+        raise InputError("grill result: suggestions가 목록이어야 함")
+    for n, sg in enumerate(suggestions):
+        if not isinstance(sg, dict) or not all(k in sg for k in ("evidence", "item", "from_score", "to_score")):
+            raise InputError(f"grill result suggestions[{n}]: evidence, item, from_score, to_score가 필요함")
+    _narrative(r)
 
 
 def _grill_blocks(r: dict) -> list:
@@ -134,7 +185,7 @@ def _grill_blocks(r: dict) -> list:
           {"type": "table", "headers": ["넣을 근거", "항목", "점수 변화"],
            "rows": [[s["evidence"], s["item"], f"{s['from_score']} → {s['to_score']}"] for s in r.get("suggestions") or []]},
           {"type": "h2", "text": "총평"},
-          {"type": "p", "text": (r.get("narrative") or {}).get("overall") or "(총평 없음)"}]
+          {"type": "p", "text": _narrative(r).get("overall") or "(총평 없음)"}]
     return b
 
 
@@ -154,7 +205,7 @@ def _ideas_blocks(r: dict) -> list:
               {"type": "list", "items": [f"{f['name']}: +{f['gain']:g}점 여지 — {' / '.join(f['unlock_hints']) or '해제 조건 없음'}"
                                          for f in i["fix_priority"]]}]
     b += [{"type": "h2", "text": "총평"},
-          {"type": "p", "text": (r.get("narrative") or {}).get("overall") or "(총평 없음)"}]
+          {"type": "p", "text": _narrative(r).get("overall") or "(총평 없음)"}]
     return b
 
 

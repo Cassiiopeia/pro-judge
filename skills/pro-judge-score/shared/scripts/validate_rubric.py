@@ -242,13 +242,15 @@ def validate_rubric(rubric, persona_dir: Path | None = None) -> list:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="rubric.yaml 검사")
     ap.add_argument("contest_dir")
+    ap.add_argument("--skip-personas", action="store_true",
+                    help="페르소나 파일 존재 확인을 건너뛴다 — 페르소나를 쓰기 전 점수표만 검사할 때")
     args = ap.parse_args(argv)
     contest = Path(args.contest_dir)
     path = contest / "rubric.yaml"
     if not path.is_file():
         print(f"rubric.yaml 없음: {path}")
         return 2
-    errors = validate_rubric(load_yaml(path), contest / "personas")
+    errors = validate_rubric(load_yaml(path), None if args.skip_personas else contest / "personas")
     if errors:
         for e in errors:
             print(f"- {e}")

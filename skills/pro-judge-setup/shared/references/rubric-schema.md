@@ -1,7 +1,7 @@
 # rubric.yaml 작성법
 
 검사: `python3 $SKILL/shared/scripts/validate_rubric.py <대회 폴더>` — `OK`가 나올 때까지 고친다.
-본보기: `skills/pro-judge-setup/references/example/rubric.yaml`.
+본보기: pro-judge-setup skill 폴더의 `references/example/rubric.yaml`.
 
 ## 필드
 
@@ -10,7 +10,7 @@
 | `contest` | 대회 이름 | 비우지 않는다 |
 | `purpose.official` | 공고의 취지 문장 원문 | 없으면 `null` |
 | `purpose.contest_types` | 대회 종류 | open-source, disability, social-impact, startup, public-data, ai-tech 중 1개 이상 |
-| `gate` | 취지·주제 게이트 | `source: official`이면 `bands`(min 0~10, multiplier 0~1, min 0 구간 필수). 공고에 근거가 없으면 `inferred`/`none` — 배율은 걸지 않고 경보만 낸다 |
+| `gate` | 취지·주제 게이트 | 공고가 취지 미달 감점·탈락을 **명시했을 때만** `source: official` + `bands`(min 0~10, multiplier 0~1, min 0 구간 필수). 배율 숫자를 네가 정했다면 official이 아니다 — `inferred`(경보만, 배율 없음) 또는 `none` |
 | `calibration.status` | 보정 여부 | `done` 또는 `none` |
 | `evaluator_groups[]` | 평가자 그룹 | `id`, `weight`(합 100), `source`, `personas`(1명 이상) |
 | `items[]` | 심사 항목 | 아래 |

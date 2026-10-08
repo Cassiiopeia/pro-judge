@@ -55,6 +55,8 @@ def main(argv=None) -> int:
     ap.add_argument("run_dir")
     args = ap.parse_args(argv)
     run_dir = Path(args.run_dir)
+    if not run_dir.is_dir():
+        raise InputError(f"런 폴더 없음: {run_dir}")
     meta = load_json(run_dir / "ideas.json")
     results = {p.name: load_json(p / "result.json")
                for p in sorted(run_dir.iterdir()) if p.is_dir() and (p / "result.json").is_file()}

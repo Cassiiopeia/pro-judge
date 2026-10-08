@@ -17,6 +17,7 @@ from _common import InputError, load_yaml, parse_yaml_text, run_cli  # noqa: E40
 REQUIRED_SECTIONS = ("누구인가", "심사위원 근거", "무겁게 보는 항목", "인정하는 근거",
                      "감점 트리거", "단골 질문", "말투")
 STRICTNESS = {"lenient", "normal", "strict"}
+MIN_QUESTIONS = 3  # persona-schema.md와 같은 규칙 — 질의응답 연습의 재료가 된다
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 
 
@@ -66,6 +67,9 @@ def validate_persona(text: str, stem: str, rubric: dict | None = None) -> list:
             errors.append(f"{stem}: '## {name}' 칸 없음")
         elif not sections[name].strip():
             errors.append(f"{stem}: '## {name}' 칸이 비어 있음")
+    questions = [l for l in sections.get("단골 질문", "").splitlines() if l.strip().startswith(("-", "*"))]
+    if "단골 질문" in sections and sections["단골 질문"].strip() and len(questions) < MIN_QUESTIONS:
+        errors.append(f"{stem}: '## 단골 질문'은 목록으로 {MIN_QUESTIONS}개 이상 (현재 {len(questions)}개)")
     return errors
 
 

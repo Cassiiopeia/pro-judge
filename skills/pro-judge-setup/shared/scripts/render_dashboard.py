@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _common import list_runs, load_json, load_yaml, run_cli  # noqa: E402
+from _common import InputError, list_runs, load_json, load_yaml, run_cli  # noqa: E402
 from report_blocks import to_html, to_markdown  # noqa: E402
 
 RECENT_COLUMNS = 5
@@ -28,6 +28,7 @@ def build(contest_dir: Path):
     contest_dir = Path(contest_dir)
     name = _contest_name(contest_dir)
     scored = [(p, load_json(p / "result.json")) for p in list_runs(contest_dir, "score") if (p / "result.json").is_file()]
+    scored = [(p, r) for p, r in scored if not r.get("calibration")]  # 보정용 채점(남의 작품)은 내 추이가 아니다
 
     rows, prev = [], None
     for p, r in scored:
@@ -70,6 +71,8 @@ def main(argv=None) -> int:
     ap.add_argument("contest_dir")
     args = ap.parse_args(argv)
     contest_dir = Path(args.contest_dir)
+    if not contest_dir.is_dir():
+        raise InputError(f"대회 폴더 없음: {contest_dir}")
     history, html = build(contest_dir)
     (contest_dir / "history.md").write_text(history, encoding="utf-8")
     (contest_dir / "index.html").write_text(html, encoding="utf-8")

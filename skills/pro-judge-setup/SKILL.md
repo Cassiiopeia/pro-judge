@@ -32,6 +32,8 @@ python3 $SKILL/shared/scripts/contest_dirs.py init <레포 루트> "<대회 이�
 
 ## 3. contest.md 쓰기
 
+공고가 회차·출처별로 나뉘어 있으면(예: 올해 공고엔 총점만, 작년 심사기준엔 항목 배점) 어느 문서의 어느 부분을 썼는지 '출처'에 모두 적고, 올해 공고와 다른 점을 '읽지 못한 것'에 적는다.
+
 ```markdown
 # <대회 이름>
 
@@ -61,10 +63,10 @@ python3 $SKILL/shared/scripts/contest_dirs.py init <레포 루트> "<대회 이�
 공고에 있는 것은 `source: official`, 네가 정한 것은 `source: inferred` + `why`.
 
 ```bash
-python3 $SKILL/shared/scripts/validate_rubric.py <대회 폴더>
+python3 $SKILL/shared/scripts/validate_rubric.py <대회 폴더> --skip-personas
 ```
 
-`OK`가 나올 때까지 고친다. 3번 고쳐도 실패하면 남은 오류 목록을 사용자에게 보여 주고 멈춘다.
+페르소나는 다음 단계에서 쓰므로 여기서는 `--skip-personas`로 점수표만 검사한다. `OK`가 나올 때까지 고친다. 3번 고쳐도 실패하면 남은 오류 목록을 사용자에게 보여 주고 멈춘다.
 
 ## 6. 페르소나 쓰기
 
@@ -75,7 +77,7 @@ python3 $SKILL/shared/scripts/validate_rubric.py <대회 폴더>
 python3 $SKILL/shared/scripts/validate_persona.py <대회 폴더>
 ```
 
-rubric 검사도 다시 돌린다(페르소나 파일 존재 확인). 3번 실패하면 멈추고 보여 준다.
+이번에는 `--skip-personas` 없이 rubric 검사를 다시 돌린다(그룹마다 페르소나 파일이 있는지 확인). 3번 실패하면 멈추고 보여 준다.
 
 ## 7. 추정값 확인받기
 
@@ -88,9 +90,10 @@ inferred 값만 모아 표로 보여 주고 확인받는다. 공식 기준이 �
 
 ## 8. 보정 제안
 
-역대 수상작·본선 자료가 있는지 묻는다. 있으면 `pro-judge-score`로 수상작과 낙선작을 채점해,
+역대 수상작·본선 자료가 있는지 묻는다. 있으면 `pro-judge-score`로 수상작과 낙선작을 **`--calibration`을 붙여** 채점해,
 수상작이 더 높게 나오는지 확인하자고 제안한다. 순서가 맞으면 `rubric.yaml`의 `calibration.status`를 `done`으로 바꾼다.
-순서가 뒤집히면 어느 항목 앵커가 원인인지 짚어 고친다. 자료가 없으면 `none`으로 두고 보고서에 "보정 안 됨"이 찍힌다고 알린다.
+순서가 뒤집히면 어느 항목 앵커가 원인인지 짚어 고치고, `validate_rubric.py`를 다시 통과시킨다.
+수상작·낙선작 한 쌍의 순서는 우연으로도 절반은 맞는다 — 가능하면 여러 쌍으로 보고, 몇 쌍 중 몇 쌍이 맞았는지 사용자에게 말한다. 자료가 없으면 `none`으로 두고 보고서에 "보정 안 됨"이 찍힌다고 알린다.
 
 ## 끝
 

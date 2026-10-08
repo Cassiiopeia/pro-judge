@@ -29,7 +29,7 @@ python3 $SKILL/shared/scripts/contest_dirs.py new-run <대회 폴더> ideas
 ## 4. 아이디어 × 페르소나 독립 실행
 
 `persona-prompt.md`에 **아이디어 모드 문단을 넣어** 서브에이전트로 보낸다. 아이디어끼리, 페르소나끼리 결과를 섞지 않는다.
-결과는 `<런 폴더>/<idea id>/<persona>.json`. 그 밖의 규칙은 `pro-judge-score`의 4단계와 같다:
+아이디어 원문은 `<런 폴더>/<idea id>/target/idea.md`에 그대로 저장한다(인용 대조용). 결과는 `<런 폴더>/<idea id>/<persona>.json`. 그 밖의 규칙은 `pro-judge-score`의 4단계와 같다:
 서브에이전트가 없으면 차례대로 돌리고 `independent: false`, 깨진 회차는 한 번 재시도.
 
 ## 5. 아이디어별 합산

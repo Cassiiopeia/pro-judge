@@ -26,13 +26,20 @@ def parse_yaml_text(text: str, where: str) -> Any:
         raise InputError(f"{where}: YAML 문법 오류 — {e}")
 
 
+def _read(path: Path) -> str:
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise InputError(f"파일 없음: {path}")
+
+
 def load_yaml(path: Path) -> Any:
-    return parse_yaml_text(Path(path).read_text(encoding="utf-8"), str(path))
+    return parse_yaml_text(_read(path), str(path))
 
 
 def load_json(path: Path) -> Any:
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
+        return json.loads(_read(path))
     except json.JSONDecodeError as e:
         raise InputError(f"{path}: JSON 문법 오류 — {e}")
 
