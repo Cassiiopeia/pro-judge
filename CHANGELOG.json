@@ -1,14 +1,43 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T04:47:30Z",
-    "currentVersion": "0.3.1",
+    "lastUpdated": "2026-10-08T06:10:47Z",
+    "currentVersion": "0.4.0",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 7
+    "totalReleases": 8
   },
   "releases": [
+    {
+      "version": "0.4.0",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-08",
+      "pr_number": 30,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **새 기능**\n  * 문서 사이트를 열었습니다 (cassiiopeia.github.io/pro-judge)\n  * 예시 보고서를 사이트에서 바로 열어 볼 수 있습니다\n  * 버그·채점 이의·대회 종류 요청 양식을 추가했습니다\n\n* **문서**\n  * README를 짧게 정리했습니다\n  * 비슷한 도구와의 차이를 정리했습니다\n  * PDF 도구 라이선스와 보안 신고 방법을 안내합니다",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "문서 사이트를 열었습니다 (cassiiopeia.github.io/pro-judge)",
+            "예시 보고서를 사이트에서 바로 열어 볼 수 있습니다",
+            "버그·채점 이의·대회 종류 요청 양식을 추가했습니다"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "README를 짧게 정리했습니다",
+            "비슷한 도구와의 차이를 정리했습니다",
+            "PDF 도구 라이선스와 보안 신고 방법을 안내합니다"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.3.1",
       "project_type": "basic",
