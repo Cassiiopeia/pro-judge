@@ -7,7 +7,7 @@
 대회 취지에 맞춘 심사위원 페르소나를 만들어 아이디어·발표자료·레포·배포 서비스를 채점한다.
 날카로운 질문으로 질의응답을 연습시키고, 결과를 md·html 보고서로 낸다.
 
-> 상태: 설계 단계 — [설계 문서](docs/superpowers/specs/2026-10-08-pro-judge-design.md)
+> 상태: 개발 중
 
 ## 구성 (예정)
 
@@ -24,7 +24,3 @@
 ```bash
 npx skills add Cassiiopeia/pro-judge
 ```
-
-## 원형
-
-2026 I/O Extended: Hack the Beat 최종 1위 때 쓴 심사 역설계 방식을 일반화했다.
