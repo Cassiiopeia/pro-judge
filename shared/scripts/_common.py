@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -46,3 +47,27 @@ def run_cli(main: Callable[[], int]) -> None:
     except InputError as e:
         print(f"오류: {e}", file=sys.stderr)
         sys.exit(2)
+
+
+RUN_KINDS = ("score", "grill", "ideas")
+# 같은 분에 두 번 돌면 -2, -3을 붙인다. 정렬은 (시각, 번호)로 해서 문자열 정렬 함정을 피한다
+RUN_NAME = re.compile(r"^(\d{8}-\d{4})_(score|grill|ideas)(?:-(\d+))?$")
+
+
+def parse_run_name(name: str):
+    m = RUN_NAME.match(name)
+    if not m:
+        return None
+    return m.group(1), m.group(2), int(m.group(3) or 1)
+
+
+def list_runs(contest_dir: Path, kind: str | None = None) -> list:
+    runs = Path(contest_dir) / "runs"
+    if not runs.is_dir():
+        return []
+    found = []
+    for p in runs.iterdir():
+        parsed = parse_run_name(p.name) if p.is_dir() else None
+        if parsed and (kind is None or parsed[1] == kind):
+            found.append((parsed[0], parsed[2], p))
+    return [p for _, _, p in sorted(found, key=lambda t: (t[0], t[1]))]
