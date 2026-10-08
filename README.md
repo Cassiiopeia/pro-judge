@@ -168,6 +168,6 @@ python3 tools/sync_shared.py   # shared/ 를 고친 뒤 각 skill로 복사
 ---
 
 <!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
-## 최신 버전 : v0.1.0 (2026-10-08)
+## 최신 버전 : v0.1.1 (2026-10-08)
 
 [전체 버전 기록 보기](CHANGELOG.md)
