@@ -1,14 +1,40 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-08T10:49:08Z",
-    "currentVersion": "0.5.0",
+    "lastUpdated": "2026-10-30T08:28:25Z",
+    "currentVersion": "0.5.1",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 12
+    "totalReleases": 13
   },
   "releases": [
+    {
+      "version": "0.5.1",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-10-30",
+      "pr_number": 43,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **새 기능**\n  * 채점 결과를 회차 파일로 바로 저장하고 검사·병합하는 도구 추가\n  * 질의응답 연습이 약한 항목을 항상 같은 규칙으로 고르도록 변경\n\n* **버그 수정**\n  * 현재 폴더(`.`)에서 실행해도 대회 폴더·회차 이름·지난 회차를 제대로 찾도록 수정",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "채점 결과를 회차 파일로 바로 저장하고 검사·병합하는 도구 추가",
+            "질의응답 연습이 약한 항목을 항상 같은 규칙으로 고르도록 변경"
+          ]
+        },
+        "버그_수정": {
+          "title": "버그 수정",
+          "items": [
+            "현재 폴더(`.`)에서 실행해도 대회 폴더·회차 이름·지난 회차를 제대로 찾도록 수정"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.5.0",
       "project_type": "basic",
