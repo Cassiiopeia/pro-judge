@@ -65,8 +65,16 @@ python3 $SKILL/shared/scripts/extract_target.py <런 폴더> <파일...> [--page
   쓴 모델을 기록한다. 모델이 2종 이상이고 전원 5점 이하인 항목은 보고서에 "공통 약점"으로 찍힌다.
 - 서브에이전트가 없는 환경이면 직접 차례대로 채점하고 `independent: false`로 기록한다.
   다음 페르소나로 넘어갈 때 앞 점수를 다시 보지 않는다.
-- 회차 JSON이 깨지면 그 회차만 한 번 다시 돌린다. 또 깨지면 그 회차를 뺀다.
-- 회차를 모아 `<런 폴더>/<persona>.json`으로 저장한다 (`persona-output.md` 형식).
+- 서브에이전트는 자기 회차를 `<런 폴더>/rounds/<persona>-<회차 번호>.json`에 **직접 쓰고** 검사한다.
+  채팅으로 JSON을 돌려받아 옮겨 적지 않는다 (옮기다 잘리거나 바뀐다).
+  ```bash
+  python3 $SKILL/shared/scripts/score_rounds.py check <런 폴더> <persona> <회차 파일>
+  ```
+- 검사가 끝내 통과하지 못한 회차는 그 회차만 한 번 다시 돌린다. 또 깨지면 그 회차 파일을 지운다.
+- 회차를 모아 `<런 폴더>/<persona>.json`으로 만든다 (`persona-output.md` 형식):
+  ```bash
+  python3 $SKILL/shared/scripts/score_rounds.py merge <런 폴더>
+  ```
 
 ## 5. 합산
 

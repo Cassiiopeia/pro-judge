@@ -15,8 +15,14 @@ description: 질의응답 연습. 최근 채점 결과의 약한 항목·상한�
 
 ## 1. 질문 재료 고르기
 
-- 득점률(`earned / points_total`)이 낮은 항목 3개
-- `caps`가 있는 항목 (해제 조건이 곧 질문)
+재료는 손으로 계산하지 않고 스크립트로 고른다 (같은 채점 결과면 같은 목록):
+
+```bash
+python3 $SKILL/shared/scripts/grill_targets.py <대회 폴더>
+```
+
+- `weak_items`: 득점률(`earned / points_total`)이 낮은 항목 3개 (같으면 배점 큰 항목 먼저)
+- `capped_items`: `caps`가 있는 항목 (해제 조건이 곧 질문)
 - `deviation_alerts`, `consensus_gaps` 항목
 - 대회 취지 질문: `rubric.yaml`의 `contest_types`마다 `$SKILL/shared/references/contest-types/<종류>.md`의 '취지 질문'에서 최소 1개를 고정으로 넣는다.
 

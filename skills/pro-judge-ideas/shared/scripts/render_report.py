@@ -26,7 +26,7 @@ def contest_labels(run_dir) -> dict:
     대회 폴더를 못 찾거나 파일이 깨져도 보고서는 id로 나가야 하므로 빈 사전으로 둔다.
     """
     labels = {"personas": {}, "items": {}}
-    run_dir = Path(run_dir)
+    run_dir = Path(run_dir).resolve()  # 상대 경로(`.`)는 parents가 비어 대회 폴더를 못 찾음
     contest = next((p for p in [run_dir, *run_dir.parents] if (p / "rubric.yaml").is_file()), None)
     if contest is None:
         return labels

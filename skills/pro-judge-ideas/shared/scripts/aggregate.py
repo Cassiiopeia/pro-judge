@@ -325,6 +325,7 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
 
 
 def _find_contest_dir(run_dir: Path) -> Path:
+    run_dir = run_dir.resolve()  # 상대 경로(`.`)는 parents가 비어 있음
     for p in [run_dir, *run_dir.parents]:
         if (p / "rubric.yaml").is_file():
             return p
@@ -368,7 +369,8 @@ def main(argv=None) -> int:
     ap.add_argument("--target", default="")
     ap.add_argument("--calibration", action="store_true", help="보정용(역대 수상작·낙선작) 채점 — 회차 비교·추이에서 뺀다")
     args = ap.parse_args(argv)
-    run_dir = Path(args.run_dir)
+    # 절대 경로로 고정 — `.`이면 parents·name이 비어 대회 폴더·회차 이름·지난 회차를 못 찾는다
+    run_dir = Path(args.run_dir).resolve()
     contest_dir = Path(args.contest_dir) if args.contest_dir else _find_contest_dir(run_dir)
     rubric = load_yaml(contest_dir / "rubric.yaml")
     # 손으로 고친 rubric이 깨져 있으면 합산 중 traceback 대신 고칠 목록을 보여 준다

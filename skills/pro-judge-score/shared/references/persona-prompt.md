@@ -53,6 +53,9 @@ claim-not-verified, claim-failed는 쓰지 않는다. 그러나 설명에 없는
 4. 상한에 걸리면 cap_applied와 unlock_hint를 쓴다.
 5. gate_score: 대회 취지(purpose)에 맞는 정도 0~10.
 6. 다른 심사위원의 판단을 추측하지 않는다.
+7. 결과 JSON을 `{런 폴더}/rounds/{페르소나 name}-{회차 번호}.json`에 직접 쓴다 ("model" 키에 너의 모델 이름을 함께 넣는다).
+   쓴 뒤 `python3 {scripts 폴더}/score_rounds.py check {런 폴더} {페르소나 name} <그 파일>`을 실행하고,
+   오류가 나오면 고쳐서 같은 파일에 다시 쓰고 통과할 때까지 검사한다. 채팅 답에는 JSON을 붙이지 말고 파일 경로만 적는다.
 
 <output_format>
 {shared/references/persona-output.md의 "한 회차 JSON" 블록과 그 아래 규칙 목록 — 서브에이전트는 이 파일을 따로 받지 못하므로 내용을 붙여 넣는다}
