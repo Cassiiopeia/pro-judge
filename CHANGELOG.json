@@ -1,14 +1,47 @@
 {
   "metadata": {
-    "lastUpdated": "2026-10-30T08:28:25Z",
-    "currentVersion": "0.5.1",
+    "lastUpdated": "2026-11-16T06:55:49Z",
+    "currentVersion": "2.0.0",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 13
+    "totalReleases": 14
   },
   "releases": [
+    {
+      "version": "2.0.0",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-11-16",
+      "pr_number": 53,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **새 기능**\n  * skill 6개를 대회 준비(pj-prepare), 채점(pj-score), 질의응답(pj-qna) 3개로 정리\n  * `/pj-score`처럼 원하는 단계를 바로 부를 수 있음\n\n* **개선**\n  * 근거 수집과 심사위원별 채점 안내를 한 곳으로 모아 단계마다 같은 규칙으로 동작\n  * 질의응답 결과 폴더 이름을 `_qna`로 변경 (이전 `_grill` 결과는 읽지 않음)\n\n* **문서**\n  * skill 소개와 업데이트 안내에 v2.0.0 변경점과 옛 skill 제거 방법 추가",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "skill 6개를 대회 준비(pj-prepare), 채점(pj-score), 질의응답(pj-qna) 3개로 정리",
+            "`/pj-score`처럼 원하는 단계를 바로 부를 수 있음"
+          ]
+        },
+        "개선": {
+          "title": "개선",
+          "items": [
+            "근거 수집과 심사위원별 채점 안내를 한 곳으로 모아 단계마다 같은 규칙으로 동작",
+            "질의응답 결과 폴더 이름을 `_qna`로 변경 (이전 `_grill` 결과는 읽지 않음)"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "skill 소개와 업데이트 안내에 v2.0.0 변경점과 옛 skill 제거 방법 추가"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.5.1",
       "project_type": "basic",
