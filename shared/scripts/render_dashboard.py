@@ -10,12 +10,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _common import InputError, list_runs, load_json, load_yaml, run_cli  # noqa: E402
+from _common import InputError, list_runs, parse_run_name, load_json, load_yaml, run_cli  # noqa: E402
 from report_blocks import to_html, to_markdown  # noqa: E402
 
 RECENT_COLUMNS = 5
 RECENT_LINKS = 10
-KIND_LABEL = {"score": "채점", "grill": "질의응답", "ideas": "아이디어"}
+KIND_LABEL = {"score": "채점", "qna": "질의응답", "ideas": "아이디어"}
 
 
 def _contest_name(contest_dir: Path) -> str:
@@ -54,7 +54,7 @@ def build(contest_dir: Path):
             # 여러 회차를 볼 때 궁금한 것은 "얼마나 올랐나"다 — 첫 열과 마지막 열 차이를 따로 둔다
             change = f"{item['earned'] - first['earned']:+.1f}" if first and len(recent) > 1 else "-"
             item_rows.append([f"{item['name']} ({item['points_total']:g})", *cells, change])
-    links = [{"text": f"{p.name} {KIND_LABEL[p.name.split('_')[1].split('-')[0]]}",
+    links = [{"text": f"{p.name} {KIND_LABEL[parse_run_name(p.name)[1]]}",
               "href": f"runs/{p.name}/report.html"}
              for p in reversed(list_runs(contest_dir)) if (p / "report.html").is_file()][:RECENT_LINKS]
 

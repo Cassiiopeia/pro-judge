@@ -41,5 +41,5 @@ def test_persona_schema_lists_sections():
 
 
 def test_required_files():
-    for name in ("judge-stance.md", "rubric-schema.md", "persona-prompt.md", "persona-output.md", "grill-output.md"):
+    for name in ("judge-stance.md", "rubric-schema.md", "persona-prompt.md", "persona-output.md", "qna-output.md", "persona-run.md", "collect-evidence.md"):
         assert (REF / name).read_text(encoding="utf-8").strip(), name

@@ -12,7 +12,7 @@ import render_report
 from render_report import contest_labels, render
 from report_blocks import to_html, to_markdown
 from factories import base_results
-from test_render_grill_ideas import GRILL
+from test_render_qna_ideas import QNA
 
 
 @pytest.fixture
@@ -71,9 +71,9 @@ def test_persona_titles_replace_ids(result, contest_dir):
     assert "개발자 심사위원" in md and "개발자 심사위원" in html
 
 
-def test_grill_uses_labels_and_cards(contest_dir):
+def test_qna_uses_labels_and_cards(contest_dir):
     labels = contest_labels(contest_dir / "runs" / "x")
-    md, html = render(GRILL, labels)
+    md, html = render(QNA, labels)
     assert "개발자 심사위원" in html and "실현 가능성" in html
     assert 'class="qa' in html
     assert "## 질문과 판정" in md
@@ -151,6 +151,6 @@ def test_evidence_status_and_gaps_readable(contest_dir):
     assert sum(1 for ln in sec.splitlines() if ln.startswith("- 실현 가능성")) == 1
 
 
-def test_grill_shows_base_run(contest_dir):
-    md, html = render({**GRILL, "based_on": "20261008-1405_score"})
+def test_qna_shows_base_run(contest_dir):
+    md, html = render({**QNA, "based_on": "20261008-1405_score"})
     assert "기준 회차 20261008-1405_score" in md

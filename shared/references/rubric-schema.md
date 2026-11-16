@@ -1,7 +1,7 @@
 # rubric.yaml 작성법
 
 검사: `python3 $SKILL/shared/scripts/validate_rubric.py <대회 폴더>` — `OK`가 나올 때까지 고친다.
-본보기: pro-judge-setup skill 폴더의 `references/example/rubric.yaml`.
+본보기: pj-prepare skill 폴더의 `references/example/rubric.yaml`.
 
 ## 필드
 

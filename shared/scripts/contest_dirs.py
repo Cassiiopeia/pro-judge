@@ -4,7 +4,7 @@
 docs/pro-judge/는 심사 전략·점수가 공개 레포에 올라가지 않게 '*' gitignore로 감싼다.
 사용:
   python3 contest_dirs.py init <레포 루트> "<대회 이름>"
-  python3 contest_dirs.py new-run <대회 폴더> <score|grill|ideas>
+  python3 contest_dirs.py new-run <대회 폴더> <score|qna|ideas>
 """
 from __future__ import annotations
 

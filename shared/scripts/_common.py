@@ -56,9 +56,9 @@ def run_cli(main: Callable[[], int]) -> None:
         sys.exit(2)
 
 
-RUN_KINDS = ("score", "grill", "ideas")
+RUN_KINDS = ("score", "qna", "ideas")
 # 같은 분에 두 번 돌면 -2, -3을 붙인다. 정렬은 (시각, 번호)로 해서 문자열 정렬 함정을 피한다
-RUN_NAME = re.compile(r"^(\d{8}-\d{4})_(score|grill|ideas)(?:-(\d+))?$")
+RUN_NAME = re.compile(r"^(\d{8}-\d{4})_(score|qna|ideas)(?:-(\d+))?$")
 
 
 def parse_run_name(name: str):

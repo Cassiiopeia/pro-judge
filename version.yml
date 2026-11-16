@@ -40,7 +40,7 @@
 # - The version is always synced automatically to the highest one
 # ===================================================================
 
-version: "0.5.1"
+version: "1.0.0"
 version_code: 14 # app build number
 project_types: ["basic"]   # array of types, first entry is primary, safe to edit by hand
 metadata:

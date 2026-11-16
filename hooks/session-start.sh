@@ -3,7 +3,7 @@
 set -euo pipefail
 project="${CLAUDE_PROJECT_DIR:-$PWD}"
 [ -d "$project/docs/pro-judge" ] || exit 0
-guide="${CLAUDE_PLUGIN_ROOT:-}/skills/using-pro-judge/SKILL.md"
+guide="${CLAUDE_PLUGIN_ROOT:-}/hooks/pro-judge-guide.md"
 [ -f "$guide" ] || exit 0
 # 본문 안의 따옴표·줄바꿈을 안전하게 JSON으로 감싸려고 python을 쓴다
 python3 - "$guide" <<'PY'

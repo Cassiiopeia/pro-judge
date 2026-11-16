@@ -9,7 +9,7 @@ from aggregate import aggregate as agg
 from contest_dirs import new_run
 from render_report import render
 from factories import base_results
-from test_render_grill_ideas import GRILL
+from test_render_qna_ideas import QNA
 
 
 def test_broken_json_file_excludes_only_that_persona(contest_dir):
@@ -60,8 +60,8 @@ def test_aggregate_rejects_invalid_rubric(contest_dir, capsys):
     lambda g: g["suggestions"][0].pop("from_score"),
     lambda g: g.__setitem__("narrative", "총평 문자열"),
 ])
-def test_grill_bad_shapes_are_input_errors(mutate):
-    g = copy.deepcopy(GRILL)
+def test_qna_bad_shapes_are_input_errors(mutate):
+    g = copy.deepcopy(QNA)
     mutate(g)
     with pytest.raises(InputError):
         render(g)

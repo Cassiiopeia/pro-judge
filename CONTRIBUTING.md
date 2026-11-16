@@ -26,7 +26,7 @@ PyMuPDF(AGPL-3.0)·poppler(GPL)를 skill 폴더에 넣거나 함께 배포하지
 
 ### 스크립트·참고 문서를 고칠 때
 
-`skills/*/shared/`는 `shared/`의 사본이다. `npx skills`가 skill 폴더 하나만 복사하기 때문에 사본을 커밋한다.
+skill은 `pj-prepare`·`pj-score`·`pj-qna` 3개다. `skills/*/shared/`는 `shared/`의 사본이다. `npx skills`가 skill 폴더 하나만 복사하기 때문에 사본을 커밋한다.
 
 ```bash
 # shared/ 를 고친 뒤

@@ -29,6 +29,12 @@ def test_repo_copies_in_sync():
     assert sync_shared.check(ROOT) == [], "python3 tools/sync_shared.py 를 실행할 것"
 
 
+def test_every_skill_gets_shared_copy():
+    # npx skills는 skill 폴더 하나만 복사 > 공용 파일을 쓰는 skill은 모두 동기화 대상이어야 설치본이 동작
+    skills = {p.name for p in (ROOT / "skills").iterdir() if p.is_dir()}
+    assert skills == set(sync_shared.TARGET_SKILLS)
+
+
 def test_plugin_manifests():
     plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
     market = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text())
@@ -91,10 +97,3 @@ def test_contest_type_check_catches_drift(tmp_path):
     (tmp_path / "shared/references/contest-types/sports.md").write_text("# sports\n", encoding="utf-8")
     profiles, schema, validator = contest_type_sources(tmp_path)
     assert profiles != schema
-
-
-def test_every_script_skill_gets_shared_copy():
-    # SKILL.md가 $SKILL/shared/를 쓰는데 동기화 대상에서 빠지면 설치본에 스크립트가 없다
-    using = {p.parent.name for p in (ROOT / "skills").glob("*/SKILL.md") if "$SKILL/shared/" in p.read_text(encoding="utf-8")}
-    assert using <= set(sync_shared.TARGET_SKILLS), using - set(sync_shared.TARGET_SKILLS)
-    assert "pro-judge-gather" in using

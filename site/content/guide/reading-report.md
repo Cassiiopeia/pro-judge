@@ -8,7 +8,7 @@
 | <a href="/pro-judge/examples/공개SW-개발자대회/index.html" target="_blank">대시보드</a> | 회차별 총점 추이와 항목별 변화 |
 | <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1845_score/report.html" target="_blank">첫 채점 — 24.2점</a> | 첫 구현 머지 시점. LICENSE·기여 경로·비교 대상이 없을 때 |
 | <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1850_score/report.html" target="_blank">다시 채점 — 54.3점</a> | v0.4.3. 무엇이 올랐고 무엇이 그대로인지 |
-| <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1852_grill/report.html" target="_blank">질의응답 연습</a> | 약한 항목을 찌르는 질문과 답 판정, 꼬리 질문 |
+| <a href="/pro-judge/examples/공개SW-개발자대회/runs/20261008-1852_qna/report.html" target="_blank">질의응답 연습</a> | 약한 항목을 찌르는 질문과 답 판정, 꼬리 질문 |
 
 <video src="/assets/report-tour.mp4" autoplay muted loop playsinline controls style="width:100%;border-radius:10px;border:1px solid var(--vp-c-divider)"></video>
 

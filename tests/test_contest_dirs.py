@@ -58,7 +58,7 @@ def test_new_run_bad_kind(tmp_path):
 
 def test_list_runs_order_and_filter(tmp_path):
     new_run(tmp_path, "score", datetime(2026, 10, 9, 9, 0))
-    new_run(tmp_path, "grill", datetime(2026, 10, 8, 9, 0))
+    new_run(tmp_path, "qna", datetime(2026, 10, 8, 9, 0))
     new_run(tmp_path, "score", datetime(2026, 10, 8, 9, 0))
     (tmp_path / "runs" / "잡동사니").mkdir()
     assert [p.name for p in list_runs(tmp_path, "score")] == ["20261008-0900_score", "20261009-0900_score"]
@@ -74,5 +74,5 @@ def test_parse_run_name():
 def test_cli(tmp_path, capsys):
     assert contest_dirs.main(["init", str(tmp_path), "대회"]) == 0
     path = capsys.readouterr().out.strip().splitlines()[-1]
-    assert contest_dirs.main(["new-run", path, "grill"]) == 0
-    assert capsys.readouterr().out.strip().endswith("_grill")
+    assert contest_dirs.main(["new-run", path, "qna"]) == 0
+    assert capsys.readouterr().out.strip().endswith("_qna")

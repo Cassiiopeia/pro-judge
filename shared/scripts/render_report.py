@@ -218,40 +218,40 @@ def _narrative(r: dict) -> dict:
     return nar
 
 
-def validate_grill(r: dict) -> None:
+def validate_qna(r: dict) -> None:
     if r.get("mode") not in ("practice", "sheet"):
-        raise InputError("grill result: mode는 practice/sheet")
+        raise InputError("qna result: mode는 practice/sheet")
     for key in ("contest", "created_at"):
         if not isinstance(r.get(key), str):
-            raise InputError(f"grill result: {key}가 문자열이어야 함")
+            raise InputError(f"qna result: {key}가 문자열이어야 함")
     questions = r.get("questions")
     if not isinstance(questions, list):
-        raise InputError("grill result: questions가 목록이어야 함")
+        raise InputError("qna result: questions가 목록이어야 함")
     for n, q in enumerate(questions):
         if not isinstance(q, dict):
-            raise InputError(f"grill result questions[{n}]: 객체여야 함 (grill-output.md 형식)")
+            raise InputError(f"qna result questions[{n}]: 객체여야 함 (qna-output.md 형식)")
         for key in ("persona", "item"):
             if not str(q.get(key) or "").strip():
-                raise InputError(f"grill result questions[{n}]: {key}가 비어 있음")
+                raise InputError(f"qna result questions[{n}]: {key}가 비어 있음")
         follow_ups = q.get("follow_ups") or []
         if not isinstance(follow_ups, list) or not all(isinstance(f, dict) for f in follow_ups):
-            raise InputError(f"grill result questions[{n}].follow_ups: 객체 목록이어야 함")
+            raise InputError(f"qna result questions[{n}].follow_ups: 객체 목록이어야 함")
         for qq in [q, *follow_ups]:
             if qq.get("verdict") not in VERDICT_LABEL:
-                raise InputError(f"grill result questions[{n}]: verdict는 up/same/down/null")
+                raise InputError(f"qna result questions[{n}]: verdict는 up/same/down/null")
             if not str(qq.get("question") or "").strip():
-                raise InputError(f"grill result questions[{n}]: question이 비어 있음")
+                raise InputError(f"qna result questions[{n}]: question이 비어 있음")
     suggestions = r.get("suggestions") or []
     if not isinstance(suggestions, list):
-        raise InputError("grill result: suggestions가 목록이어야 함")
+        raise InputError("qna result: suggestions가 목록이어야 함")
     for n, sg in enumerate(suggestions):
         if not isinstance(sg, dict) or not all(k in sg for k in ("evidence", "item", "from_score", "to_score")):
-            raise InputError(f"grill result suggestions[{n}]: evidence, item, from_score, to_score가 필요함")
+            raise InputError(f"qna result suggestions[{n}]: evidence, item, from_score, to_score가 필요함")
     _narrative(r)
 
 
-def _grill_blocks(r: dict, labels: dict | None = None) -> list:
-    validate_grill(r)
+def _qna_blocks(r: dict, labels: dict | None = None) -> list:
+    validate_qna(r)
     mode = "연습" if r["mode"] == "practice" else "질문지"
     b = [{"type": "h1", "text": f"{r['contest']} 질의응답 보고서"},
          {"type": "meta", "items": [_when(r["created_at"]), f"{mode} 모드", f"질문 {len(r['questions'])}개"]
@@ -308,7 +308,7 @@ def _ideas_blocks(r: dict, labels: dict | None = None) -> list:
     return b
 
 
-BUILDERS = {"score": _score_blocks, "grill": _grill_blocks, "ideas": _ideas_blocks}
+BUILDERS = {"score": _score_blocks, "qna": _qna_blocks, "ideas": _ideas_blocks}
 
 
 def build_blocks(result: dict, labels: dict | None = None) -> list:

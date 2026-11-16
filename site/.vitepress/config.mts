@@ -60,7 +60,7 @@ export default withMermaid(defineConfig({
         text: '이해하기',
         items: [
           { text: '작동 방식', link: '/guide/how-it-works' },
-          { text: 'skill 6개', link: '/guide/skills' },
+          { text: 'skill 3개', link: '/guide/skills' },
           { text: '비슷한 도구와의 차이', link: '/guide/compare' },
           { text: '검증 결과', link: '/validation' },
         ],

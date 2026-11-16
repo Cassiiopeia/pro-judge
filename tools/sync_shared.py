@@ -14,7 +14,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TARGET_SKILLS = ("pro-judge-setup", "pro-judge-ideas", "pro-judge-score", "pro-judge-grill", "pro-judge-gather")
+# 공용 파일을 쓰는 skill 3개: 대회 준비, 채점, 질의응답
+TARGET_SKILLS = ("pj-prepare", "pj-score", "pj-qna")
 IGNORE_DIRS = {"__pycache__", ".pytest_cache"}
 
 
