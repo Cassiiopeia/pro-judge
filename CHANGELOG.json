@@ -1,14 +1,33 @@
 {
   "metadata": {
-    "lastUpdated": "2026-11-16T06:55:49Z",
-    "currentVersion": "2.0.0",
+    "lastUpdated": "2026-11-18T11:46:34Z",
+    "currentVersion": "2.1.0",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 14
+    "totalReleases": 15
   },
   "releases": [
+    {
+      "version": "2.1.0",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-11-18",
+      "pr_number": 56,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **개선**\n  * 공용 채점 스크립트의 이름과 주석을 코드 규칙에 맞게 정리 (동작 변화 없음)",
+      "parsed_changes": {
+        "개선": {
+          "title": "개선",
+          "items": [
+            "공용 채점 스크립트의 이름과 주석을 코드 규칙에 맞게 정리 (동작 변화 없음)"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "2.0.0",
       "project_type": "basic",
