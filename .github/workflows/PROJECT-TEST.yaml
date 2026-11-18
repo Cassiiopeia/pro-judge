@@ -3,7 +3,9 @@
 # pro-judge 테스트: pytest + shared/ 사본 동기화 검사
 # ===================================================================
 #
-# 트리거: develop·main 대상 PR, develop push (+ 수동 실행)
+# 트리거: develop 대상 PR, develop push (+ 수동 실행)
+# main 대상 배포 PR은 제외: 같은 코드가 develop push에서 이미 검사됨,
+#   릴리스 봇 버전 커밋 직후 자동 머지와 겹치면 job 0개로 실패 처리됨
 # 검사 2개: shared/ ↔ skills/*/shared/ 사본 일치, pytest 전체
 # Python: CONTRIBUTING.md 최소 버전(3.9) + 최신 안정판
 # ===================================================================
@@ -12,7 +14,7 @@ name: PROJECT-TEST
 
 on:
   pull_request:
-    branches: ["develop", "main"]
+    branches: ["develop"]
   push:
     branches: ["develop"]
   workflow_dispatch:
