@@ -1,14 +1,33 @@
 {
   "metadata": {
-    "lastUpdated": "2026-11-18T12:00:23Z",
-    "currentVersion": "2.1.1",
+    "lastUpdated": "2026-11-18T12:05:35Z",
+    "currentVersion": "2.1.2",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 16
+    "totalReleases": 17
   },
   "releases": [
+    {
+      "version": "2.1.2",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-11-18",
+      "pr_number": 59,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **기타**\n  * 배포 PR에서 테스트가 중복 실행되며 실패로 남던 문제 정리 (테스트는 develop 반영 시점에 실행)",
+      "parsed_changes": {
+        "기타": {
+          "title": "기타",
+          "items": [
+            "배포 PR에서 테스트가 중복 실행되며 실패로 남던 문제 정리 (테스트는 develop 반영 시점에 실행)"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "2.1.1",
       "project_type": "basic",
