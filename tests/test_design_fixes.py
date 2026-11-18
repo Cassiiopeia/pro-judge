@@ -50,6 +50,15 @@ def test_cli_reads_target_folder(contest_dir):
     assert item(out, "feasibility")["by_persona"]["citizen"] == 6
 
 
+def test_read_target_skips_binary_originals(tmp_path):
+    # 원본 PDF는 글자만 있어도 대조 원문에 섞이면 안 되고, 통째로 읽을 필요도 없다
+    (tmp_path / "target").mkdir()
+    (tmp_path / "target" / "slides.txt").write_text("추출한 본문", encoding="utf-8")
+    (tmp_path / "target" / "slides.pdf").write_text("%PDF-1.4 ascii only", encoding="utf-8")
+    (tmp_path / "target" / "shot.png").write_bytes(b"\x89PNG\r\n")
+    assert aggregate._read_target(tmp_path) == "추출한 본문"
+
+
 # D2 — 고칠 것은 다음 앵커까지 오르는 점수로 고른다
 def test_fix_priority_targets_next_anchor(rubric):
     results = [

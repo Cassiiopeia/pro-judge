@@ -94,3 +94,23 @@ def test_fork_team_work_on_other_branches(tmp_path):
     text = rf.facts(fork, upstream=str(up))
     assert "원본 대비 팀 커밋 3개" in text and "Team 3" in text
     assert "rpi5-port 3" in text  # 어느 브랜치에 팀 작업이 있는지
+
+
+def test_fork_many_branches_counted_each(tmp_path):
+    # 브랜치별 집계를 동시에 돌려도 브랜치와 숫자가 서로 엇갈리면 안 된다
+    up = tmp_path / "upstream"
+    up.mkdir()
+    git(up, "init", "-q", "-b", "main")
+    commit(up, "core.c", "x", "2025-06-01T10:00:00", author="Upstream")
+    team = tmp_path / "team-remote"
+    subprocess.run(["git", "clone", "-q", str(up), str(team)], check=True)
+    for b, n in (("feat-a", 1), ("feat-b", 4), ("feat-c", 2), ("same-as-up", 0)):
+        git(team, "checkout", "-q", "-b", b, "main")
+        for k in range(n):
+            commit(team, f"{b}{k}.c", "y", f"2025-08-0{k + 1}T10:00:00", author="Team")
+    git(team, "checkout", "-q", "main")
+    fork = tmp_path / "fork"
+    subprocess.run(["git", "clone", "-q", str(team), str(fork)], check=True)
+    text = rf.facts(fork, upstream=str(up))
+    assert "팀 커밋이 있는 브랜치 3개: feat-b 4, feat-c 2, feat-a 1" in text
+    assert "same-as-up" not in text

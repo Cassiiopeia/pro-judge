@@ -1,5 +1,9 @@
 """채점 대상 파일 → <런>/target/*.txt 추출. PDF 백엔드·OCR 엔진은 가짜로 바꿔 끼워 OS와 무관하게 검사한다."""
+import shutil
+import subprocess
+import time
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -143,6 +147,100 @@ def test_windows_ocr_command_is_built_in_powershell(tmp_path):
 
 def test_pick_ocr_none_when_disabled():
     assert et.pick_ocr("none") is None
+
+
+class FakeRun:
+    """subprocess.run 대역. pdfinfo·pdftotext 호출을 기록하고 정해 둔 출력을 돌려준다."""
+
+    def __init__(self, pages, whole_ok=True):
+        self.pages, self.whole_ok, self.calls = pages, whole_ok, []
+
+    def __call__(self, cmd, **kw):
+        self.calls.append(cmd)
+        if cmd[0] == "pdfinfo":
+            out, code = f"Pages:          {len(self.pages)}\n", 0
+        elif "-f" in cmd:
+            out, code = self.pages[int(cmd[cmd.index("-f") + 1]) - 1] + "\f", 0
+        else:
+            out = "".join(p + "\f" for p in self.pages) if self.whole_ok else "깨진 출력"
+            code = 0 if self.whole_ok else 1
+        return subprocess.CompletedProcess(cmd, code, stdout=out, stderr="")
+
+
+def test_poppler_extracts_whole_document_once(tmp_path, monkeypatch):
+    # 쪽마다 pdftotext를 띄우지 않는다 — 100쪽 실측 1.57초 → 0.02초
+    fake = FakeRun(["첫 쪽", "둘째 쪽", "셋째 쪽"])
+    monkeypatch.setattr(et.subprocess, "run", fake)
+    b, pdf = et.PopplerBackend(), tmp_path / "a.pdf"
+    assert [b.page_text(pdf, n) for n in (1, 2, 3)] == ["첫 쪽\f", "둘째 쪽\f", "셋째 쪽\f"]
+    assert sum(c[0] == "pdftotext" for c in fake.calls) == 1
+
+
+def test_poppler_falls_back_to_per_page_when_whole_fails(tmp_path, monkeypatch):
+    fake = FakeRun(["첫 쪽", "둘째 쪽"], whole_ok=False)
+    monkeypatch.setattr(et.subprocess, "run", fake)
+    b, pdf = et.PopplerBackend(), tmp_path / "a.pdf"
+    assert b.page_text(pdf, 2) == "둘째 쪽\f"
+    assert ["-f", "2"] == [c for c in fake.calls if "-f" in c][0][1:3]
+
+
+@pytest.mark.skipif(not (shutil.which("pdftotext") and shutil.which("pdfinfo")), reason="poppler 없음")
+def test_poppler_whole_matches_per_page_on_real_pdf(tmp_path):
+    # 한 번에 뽑아 나눈 글자가 쪽별 호출 결과와 한 글자도 다르지 않아야 한다
+    fitz = pytest.importorskip("pymupdf")
+    pdf = tmp_path / "real.pdf"
+    doc = fitz.open()
+    for i in range(5):
+        doc.new_page().insert_text((72, 72), f"page {i + 1} body text long enough", fontsize=11)
+    doc.new_page()  # 빈 쪽도 쪽 수가 어긋나지 않아야 한다
+    doc.save(str(pdf))
+    b = et.PopplerBackend()
+    per_page = [subprocess.run(["pdftotext", "-f", str(n), "-l", str(n), "-layout", str(pdf), "-"],
+                               capture_output=True, text=True).stdout for n in range(1, 7)]
+    assert [b.page_text(pdf, n) for n in range(1, 7)] == per_page
+    assert b._pages[pdf] is not None  # 실제로 한 번에 뽑는 경로를 탔다
+
+
+def test_pypdf_reader_opened_once(tmp_path):
+    opened = []
+
+    class Page:
+        def __init__(self, n):
+            self.n = n
+
+        def extract_text(self):
+            return f"쪽 {self.n}"
+
+    class Reader:
+        def __init__(self, path):
+            opened.append(path)
+            self.pages = [Page(n) for n in (1, 2, 3)]
+
+    b = et.PypdfBackend(type("pypdf", (), {"PdfReader": Reader}))
+    pdf = tmp_path / "a.pdf"
+    assert b.page_count(pdf) == 3
+    assert [b.page_text(pdf, n) for n in (1, 2, 3)] == ["쪽 1", "쪽 2", "쪽 3"]
+    assert len(opened) == 1
+
+
+def test_ocr_each_runs_in_parallel_and_keeps_mapping(tmp_path, monkeypatch):
+    # 결과는 이미지별로 그대로 짝지어져야 하고, 장당 시간이 쌓이지 않아야 한다
+    images = [tmp_path / f"p{n}.png" for n in range(4)]
+    started, ended, envs = [], [], []
+
+    def fake_run(cmd, **kw):
+        started.append(time.monotonic())
+        envs.append(kw.get("env"))
+        time.sleep(0.2)
+        ended.append(time.monotonic())
+        return subprocess.CompletedProcess(cmd, 0, stdout=f"글자 {Path(cmd[1]).stem}", stderr="")
+
+    monkeypatch.setattr(et.subprocess, "run", fake_run)
+    monkeypatch.setattr(et, "OCR_WORKERS", 4)
+    got = et._ocr_each(lambda img: ["ocr", str(img)], images, {"OMP_THREAD_LIMIT": "1"})
+    assert got == {img: f"글자 {img.stem}" for img in images}
+    assert max(started) < min(ended)  # 넷 모두 하나가 끝나기 전에 시작했다
+    assert envs == [{"OMP_THREAD_LIMIT": "1"}] * 4
 
 
 class BrokenPage(FakePdf):
