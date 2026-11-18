@@ -159,17 +159,18 @@ def collect_inferred(rubric: dict) -> list:
     return rules
 
 
-def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
-              created_at: str = "", target: str = "", run: str = "",
-              load_failures: dict | None = None, source_text: str | None = None,
-              is_calibration: bool = False) -> dict:
-    groups = rubric["evaluator_groups"]
+def _persona_groups(groups: list) -> dict:
+    """페르소나 > 속한 평가자 그룹 id 목록"""
     persona_groups: dict = {}
     for g in groups:
         for p in g["personas"]:
             persona_groups.setdefault(p, []).append(g["id"])
+    return persona_groups
 
-    source_norm = _norm_text(source_text) if source_text is not None else None
+
+def _check_personas(rubric: dict, raw_results: list, persona_groups: dict,
+                    source_norm: str | None, load_failures: dict | None):
+    """페르소나 원자료 검사 > (통과 {이름: 정규화 결과}, 제외 {이름: 사유}, 경고)"""
     # 파일 자체를 못 읽은 페르소나도 "제외"로 남겨 N명 중 M명에 반영한다
     valid, failed, warnings = {}, dict(load_failures or {}), []
     for raw in raw_results:
@@ -184,47 +185,55 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
             failed[name] = errs
         else:
             valid[name] = norm
+    return valid, failed, warnings
 
-    members = {g["id"]: [p for p in g["personas"] if p in valid] for g in groups}
-    for gid, ps in members.items():
-        if not ps:
-            raise AggregateError(f"평가자 그룹 {gid}에 쓸 수 있는 채점 결과가 하나도 없음")
 
-    med = {p: {iid: median(r["items"][iid]["score"] for r in v["runs"]) for iid in v["runs"][0]["items"]}
-           for p, v in valid.items()}
+class _ItemScorer:
+    """항목 득점 계산: 페르소나별 회차 중앙값 > 그룹 평균 > 배점 환산"""
 
-    def group_score(iid: str, gid: str) -> float:
-        return mean(med[p][iid] for p in members[gid])
+    def __init__(self, groups: list, valid: dict):
+        self.members = {g["id"]: [p for p in g["personas"] if p in valid] for g in groups}
+        for gid, ps in self.members.items():
+            if not ps:
+                raise AggregateError(f"평가자 그룹 {gid}에 쓸 수 있는 채점 결과가 하나도 없음")
+        self.median_by_persona = {
+            p: {iid: median(r["items"][iid]["score"] for r in v["runs"]) for iid in v["runs"][0]["items"]}
+            for p, v in valid.items()}
 
-    def earned_of(item: dict, shift: int = 0) -> float:
+    def group_score(self, iid: str, gid: str) -> float:
+        return mean(self.median_by_persona[p][iid] for p in self.members[gid])
+
+    def earned(self, item: dict, shift: int = 0) -> float:
+        """배점 환산 득점 (shift: 추정 규칙 민감도용 ±점, 0~10으로 자름)"""
         total = 0.0
         for gid, pts in item["points"].items():
-            gs = min(10.0, max(0.0, group_score(item["id"], gid) + shift))
+            gs = min(10.0, max(0.0, self.group_score(item["id"], gid) + shift))
             total += gs / 10 * pts
         return total
 
+
+def _build_item_rows(rubric: dict, valid: dict, scorer: _ItemScorer, previous: dict | None) -> list:
+    """점수표 항목마다 득점·편차·상한·인용·지난 회차 대비 변화 행 생성 (_item: 이후 계산용 원본)"""
     prev_items = {i["id"]: i for i in (previous or {}).get("items", [])}
-    items_out = []
+    rows = []
     for it in rubric["items"]:
         iid = it["id"]
-        scorers = [p for p in valid if iid in med[p]]  # 이 항목에 배점이 있는 그룹의 심사위원만
-        by_persona = {p: med[p][iid] for p in scorers}
-        persona_caps = [_majority_cap(valid[p]["runs"], iid) for p in scorers]
-        caps = _unique(persona_caps, 10)
+        scorers = [p for p in valid if iid in scorer.median_by_persona[p]]  # 이 항목에 배점이 있는 그룹의 심사위원만
+        by_persona = {p: scorer.median_by_persona[p][iid] for p in scorers}
+        caps = _unique([_majority_cap(valid[p]["runs"], iid) for p in scorers], 10)
         inferred_caps = {c["rule"] for c in it.get("caps") or [] if c.get("source") == "inferred"}
         all_runs = [r for p in scorers for r in valid[p]["runs"]]
-        earned = earned_of(it)
-        points_total = sum(it["points"].values())
+        earned = scorer.earned(it)
         prev = prev_items.get(iid)
-        items_out.append({
+        rows.append({
             "id": iid,
             "name": it["name"],
             "source": it["source"],
-            "points_total": _r(points_total),
+            "points_total": _r(sum(it["points"].values())),
             "earned": _r(earned),
             "score_mean": _r(mean(by_persona.values())),
             "by_persona": {p: _r(s) for p, s in by_persona.items()},
-            "group_scores": {gid: _r(group_score(iid, gid)) for gid in it["points"]},
+            "group_scores": {gid: _r(scorer.group_score(iid, gid)) for gid in it["points"]},
             "spread": _r(max(by_persona.values()) - min(by_persona.values())),
             "caps": caps,
             "quotes": _unique((q for r in all_runs for q in r["items"][iid]["quotes"]), 5),
@@ -235,8 +244,11 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
                                 - min(r["items"][iid]["score"] for r in valid[p]["runs"]) for p in scorers)),
             "_item": it,
         })
+    return rows
 
-    gate_cfg = rubric.get("gate") or {}
+
+def _gate_multiplier(gate_cfg: dict, valid: dict):
+    """취지 점수(페르소나별 회차 중앙값의 평균) > (점수, 배수). 공식 기준이 없으면 배수 1"""
     gate_score = mean(median(r["gate_score"] for r in v["runs"]) for v in valid.values())
     multiplier = 1.0
     if gate_cfg.get("source") == "official":
@@ -244,24 +256,31 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
             if gate_score >= band["min"]:
                 multiplier = band["multiplier"]
                 break
+    return gate_score, multiplier
 
-    raw_total = sum(i["earned"] for i in items_out)
-    total = _r(round(raw_total * multiplier, 1))
-    inferred_share = _r(sum(i["points_total"] for i in items_out if i["inferred_dependent"]) / 100)
-    total_range = None
-    if inferred_share >= INFERRED_RANGE_SHARE:
-        low = sum(earned_of(i["_item"], -INFERRED_MARGIN) if i["inferred_dependent"] else i["earned"] for i in items_out)
-        high = sum(earned_of(i["_item"], INFERRED_MARGIN) if i["inferred_dependent"] else i["earned"] for i in items_out)
-        total_range = [_r(round(low * multiplier, 1)), _r(round(high * multiplier, 1))]
 
+def _total_range(rows: list, scorer: _ItemScorer, multiplier: float, inferred_share: float):
+    """추정 규칙 비중이 기준 이상이면 추정 항목만 ±INFERRED_MARGIN 흔든 [최저, 최고], 아니면 None"""
+    if inferred_share < INFERRED_RANGE_SHARE:
+        return None
+    low = sum(scorer.earned(i["_item"], -INFERRED_MARGIN) if i["inferred_dependent"] else i["earned"] for i in rows)
+    high = sum(scorer.earned(i["_item"], INFERRED_MARGIN) if i["inferred_dependent"] else i["earned"] for i in rows)
+    return [_r(round(low * multiplier, 1)), _r(round(high * multiplier, 1))]
+
+
+def _consensus_gaps(rows: list, valid: dict) -> list:
+    """모델 2종 이상이 채점했고 전원 CONSENSUS_MAX_SCORE 이하인 항목 id"""
     # 모델 수는 그 항목을 실제로 채점한 심사위원 기준 — 1명만 채점한 항목이 "공통"이 되지 않게
-    consensus = [i["id"] for i in items_out
-                 if len({valid[p]["model"] for p in i["by_persona"] if valid[p]["model"]}) >= 2
-                 and all(s <= CONSENSUS_MAX_SCORE for s in i["by_persona"].values())]
+    return [i["id"] for i in rows
+            if len({valid[p]["model"] for p in i["by_persona"] if valid[p]["model"]}) >= 2
+            and all(s <= CONSENSUS_MAX_SCORE for s in i["by_persona"].values())]
 
+
+def _fix_priority(rows: list, multiplier: float) -> list:
+    """다음 앵커(5·10점)까지 올렸을 때 오르는 총점 순 상위 5개"""
     # "못 받은 점수"가 아니라 "다음 앵커까지 올렸을 때 오르는 점수"로 고른다 — 앵커 문장이 곧 할 일이다
     candidates = []
-    for i in items_out:
+    for i in rows:
         if not i["points_total"]:
             continue
         level = i["earned"] / i["points_total"] * 10
@@ -276,17 +295,51 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
                            # 순위는 다음 앵커 기준 그대로 두고, 만점까지 남은 점수를 함께 낸다
                            "max_gain": _r(round((i["points_total"] - i["earned"]) * multiplier, 1)),
                            "caps": i["caps"], "unlock_hints": i["unlock_hints"]})
-    fix_priority = sorted(candidates, key=lambda f: f["gain"], reverse=True)[:5]
+    return sorted(candidates, key=lambda f: f["gain"], reverse=True)[:5]
+
+
+def _largest_losses(rows: list, multiplier: float) -> list:
+    """만점 대비 잃은 점수가 큰 항목 상위 3개"""
     # 다음 앵커가 가까운 항목은 순위에서 밀리지만 손실은 클 수 있다 — 가장 큰 구멍은 따로 보여 준다
     losses = sorted(({"item": i["id"], "name": i["name"], "caps": i["caps"],
                       "lost": _r(round((i["points_total"] - i["earned"]) * multiplier, 1))}
-                     for i in items_out if i["points_total"] - i["earned"] > 1e-9),
+                     for i in rows if i["points_total"] - i["earned"] > 1e-9),
                     key=lambda x: x["lost"], reverse=True)[:3]
-    losses = [{"item": x["item"], "name": x["name"], "lost": x["lost"], "caps": x["caps"]} for x in losses]
+    return [{"item": x["item"], "name": x["name"], "lost": x["lost"], "caps": x["caps"]} for x in losses]
 
+
+def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
+              created_at: str = "", target: str = "", run: str = "",
+              load_failures: dict | None = None, source_text: str | None = None,
+              is_calibration: bool = False) -> dict:
+    """채점 합산: 페르소나 검사 > 항목별 득점 > 취지 배수·총점 > 진단(편차·공통 약점·고칠 것·손실) > 결과 조립"""
+    groups = rubric["evaluator_groups"]
+    persona_groups = _persona_groups(groups)
+    source_norm = _norm_text(source_text) if source_text is not None else None
+
+    # 페르소나 검사 (규칙 강제, 제외 사유)
+    valid, failed, warnings = _check_personas(rubric, raw_results, persona_groups, source_norm, load_failures)
+    scorer = _ItemScorer(groups, valid)
+
+    # 항목별 득점
+    items_out = _build_item_rows(rubric, valid, scorer, previous)
+
+    # 취지 배수·총점 (추정 규칙 비중이 크면 범위)
+    gate_cfg = rubric.get("gate") or {}
+    gate_score, multiplier = _gate_multiplier(gate_cfg, valid)
+    raw_total = sum(i["earned"] for i in items_out)
+    total = _r(round(raw_total * multiplier, 1))
+    inferred_share = _r(sum(i["points_total"] for i in items_out if i["inferred_dependent"]) / 100)
+    total_range = _total_range(items_out, scorer, multiplier, inferred_share)
+
+    # 진단 (공통 약점, 고칠 것, 손실)
+    consensus = _consensus_gaps(items_out, valid)
+    fix_priority = _fix_priority(items_out, multiplier)
+    losses = _largest_losses(items_out, multiplier)
     for i in items_out:
         del i["_item"]
 
+    # 결과 조립
     expected = list(persona_groups)
     cal_cfg = rubric.get("calibration") or {}
     return {
