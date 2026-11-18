@@ -6,7 +6,7 @@
 
 ```bash [npx skills]
 npx skills update                                  # 바뀐 skill만 다시 받는다
-npx skills add Cassiiopeia/pro-judge#v0.3.1        # 특정 릴리스로 고정
+npx skills add Cassiiopeia/pro-judge#v2.1.0        # 특정 릴리스로 고정
 ```
 
 ```text [Claude Code 플러그인]
