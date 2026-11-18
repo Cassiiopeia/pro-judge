@@ -27,7 +27,7 @@ PDF 발표자료를 채점하려면 PDF 도구가 하나 있어야 한다. 아�
 | --- | --- | --- |
 | 쓰는 곳 | Claude Code | Claude Code, Codex, Cursor 등 [지원 에이전트](https://github.com/vercel-labs/skills#supported-agents) |
 | 설치 범위 | 사용자 전체 | 현재 프로젝트(기본) 또는 전체(`-g`) |
-| 길잡이 자동 로드 | 대회가 등록된 레포를 열면 켜진다 | 없음. "pro-judge"라고 부른다 |
+| 길잡이 자동 로드 | 대회가 등록된 레포를 열면 켜진다 | 없음. 말로 요청하거나 `/pj-score`처럼 바로 부른다 |
 
 ::: code-group
 

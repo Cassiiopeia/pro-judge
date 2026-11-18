@@ -26,14 +26,14 @@ Claude Code 플러그인으로 설치하려면 `/plugin marketplace add Cassiiop
 
 ## 쓰기
 
-명령어 없이 말로 시킨다.
+명령어 없이 말로 시킨다. `/pj-score`처럼 skill을 바로 불러도 된다.
 
-| 하고 싶은 것 | 이렇게 말한다 |
-| --- | --- |
-| 대회 등록 | `이 대회 나갈 거야 <공고 URL·PDF>` |
-| 아이디어 비교 | `아이디어 3개 중 뭐가 점수 잘 나와?` |
-| 자료 채점 | `발표자료 몇 점이야? ./slides.pdf` · `이 레포 채점해줘` |
-| 질의응답 연습 | `질의응답 연습하자` |
+| 하고 싶은 것 | 이렇게 말한다 | skill |
+| --- | --- | --- |
+| 대회 등록 | `이 대회 나갈 거야 <공고 URL·PDF>` | `pj-prepare` |
+| 아이디어 비교 | `아이디어 3개 중 뭐가 점수 잘 나와?` | `pj-score` |
+| 자료 채점 | `발표자료 몇 점이야? ./slides.pdf` · `이 레포 채점해줘` | `pj-score` |
+| 질의응답 연습 | `질의응답 연습하자` | `pj-qna` |
 
 <p align="center">
   <a href="https://cassiiopeia.github.io/pro-judge/#대화로-쓴다"><img src="assets/conversation-demo.png" alt="Claude Code에서 채점 결과를 요약하고 질의응답을 연습하는 실제 대화" width="720"></a>

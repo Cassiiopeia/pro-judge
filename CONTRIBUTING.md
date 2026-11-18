@@ -18,6 +18,7 @@ PyMuPDF(AGPL-3.0)·poppler(GPL)를 skill 폴더에 넣거나 함께 배포하지
 1. 이슈를 먼저 연다. 버그는 재현 절차, 기능은 "어떤 대회 준비자가 무엇을 못 해서" 필요한지 적는다.
 2. `develop`에서 브랜치를 만든다. PR도 **`develop`으로** 연다. `main`은 릴리스 전용이다.
 3. 테스트를 먼저 쓰고(고치기 전에 실패하는 것을 확인), 고친 뒤 `python3 -m pytest`를 통과시킨다.
+   PR을 열면 같은 검사(sync 확인 + pytest, Python 3.9·3.13)가 자동으로 돈다. 코딩 에이전트는 [AGENTS.md](AGENTS.md)도 읽는다.
 4. PR 본문에 이슈 링크와 테스트 결과를 적는다.
 
 커밋 메시지 형식: `<이슈 제목> : <feat|fix|docs|refactor|test|chore> : <무엇을 왜> <이슈 URL>`

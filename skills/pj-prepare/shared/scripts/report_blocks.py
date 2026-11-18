@@ -242,7 +242,9 @@ def _blocks_html(blocks: list) -> list:
         if t in ("h1", "h2"):
             body.append(f"<{t}>{escape(str(b['text']))}</{t}>")
         elif t == "p":
-            body.append(f'<p{" class=\"muted\"" if b.get("muted") else ""}>{escape(str(b["text"]))}</p>')
+            # f-string 안 역슬래시는 3.12 미만에서 문법 오류 > 클래스 속성을 밖에서 계산
+            muted_class = ' class="muted"' if b.get("muted") else ""
+            body.append(f'<p{muted_class}>{escape(str(b["text"]))}</p>')
         elif t == "meta":
             body.append('<ul class="meta">' + "".join(f"<li>{escape(str(x))}</li>" for x in b["items"]) + "</ul>")
         elif t == "callout":

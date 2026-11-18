@@ -1,0 +1,52 @@
+# ===================================================================
+# PROJECT-TEST.yaml
+# pro-judge 테스트: pytest + shared/ 사본 동기화 검사
+# ===================================================================
+#
+# 트리거: develop·main 대상 PR, develop push (+ 수동 실행)
+# 검사 2개: shared/ ↔ skills/*/shared/ 사본 일치, pytest 전체
+# Python: CONTRIBUTING.md 최소 버전(3.9) + 최신 안정판
+# ===================================================================
+
+name: PROJECT-TEST
+
+on:
+  pull_request:
+    branches: ["develop", "main"]
+  push:
+    branches: ["develop"]
+  workflow_dispatch:
+
+# 읽기만 필요 (코드 체크아웃)
+permissions:
+  contents: read
+
+# 같은 브랜치의 이전 실행은 취소
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 필수 의존성은 PyYAML 하나 (CONTRIBUTING.md 환경 절)
+      - name: Install dependencies
+        run: python -m pip install pyyaml pytest
+
+      # shared/ 수정 후 sync 누락 시 실패
+      - name: Check shared copies
+        run: python tools/sync_shared.py --check
+
+      - name: Run tests
+        run: python -m pytest -q
