@@ -40,11 +40,11 @@
 # - The version is always synced automatically to the highest one
 # ===================================================================
 
-version: "2.1.0"
-version_code: 16 # app build number
+version: "2.1.1"
+version_code: 17 # app build number
 project_types: ["basic"]   # array of types, first entry is primary, safe to edit by hand
 metadata:
-  last_updated: "2026-11-18 11:46:33"
+  last_updated: "2026-11-18 12:00:22"
   last_updated_by: "Cassiiopeia"
   default_branch: "main"
   integrated_from: "projectops"

@@ -1,14 +1,49 @@
 {
   "metadata": {
-    "lastUpdated": "2026-11-18T11:46:34Z",
-    "currentVersion": "2.1.0",
+    "lastUpdated": "2026-11-18T12:00:23Z",
+    "currentVersion": "2.1.1",
     "projectType": "basic",
     "projectTypes": [
       "basic"
     ],
-    "totalReleases": 15
+    "totalReleases": 16
   },
   "releases": [
+    {
+      "version": "2.1.1",
+      "project_type": "basic",
+      "project_types": [
+        "basic"
+      ],
+      "date": "2026-11-18",
+      "pr_number": 58,
+      "raw_summary": "## Summary by CodeRabbit\n\n## 릴리스 노트\n\n* **개선**\n  * 큰 PDF 채점 준비가 빨라짐 (poppler 사용 시 100쪽 1.68초 → 0.05초, pypdf도 문서를 한 번만 읽음)\n  * 글자가 없는 쪽의 OCR을 최대 4장씩 동시에 처리\n  * fork 저장소 채점 시 원본 비교가 빨라짐 (브랜치 40개 0.66초 → 0.25초)\n  * 채점 합산 코드를 단계별로 정리 (결과 동일)\n\n* **문서**\n  * 업데이트 안내의 특정 릴리스 고정 예시를 v2.1.0으로 갱신\n  * v2.1.0 릴리스 노트에 빠졌던 변경 내역 추가\n\n* **기타**\n  * 쓰지 않는 보고서 GIF(3.3MB)를 삭제해 플러그인 설치 크기 축소",
+      "parsed_changes": {
+        "개선": {
+          "title": "개선",
+          "items": [
+            "큰 PDF 채점 준비가 빨라짐 (poppler 사용 시 100쪽 1.68초 → 0.05초, pypdf도 문서를 한 번만 읽음)",
+            "글자가 없는 쪽의 OCR을 최대 4장씩 동시에 처리",
+            "fork 저장소 채점 시 원본 비교가 빨라짐 (브랜치 40개 0.66초 → 0.25초)",
+            "채점 합산 코드를 단계별로 정리 (결과 동일)"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "업데이트 안내의 특정 릴리스 고정 예시를 v2.1.0으로 갱신",
+            "v2.1.0 릴리스 노트에 빠졌던 변경 내역 추가"
+          ]
+        },
+        "기타": {
+          "title": "기타",
+          "items": [
+            "쓰지 않는 보고서 GIF(3.3MB)를 삭제해 플러그인 설치 크기 축소"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "2.1.0",
       "project_type": "basic",
