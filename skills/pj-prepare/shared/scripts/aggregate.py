@@ -159,7 +159,7 @@ def collect_inferred(rubric: dict) -> list:
 def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
               created_at: str = "", target: str = "", run: str = "",
               load_failures: dict | None = None, source_text: str | None = None,
-              calibration: bool = False) -> dict:
+              is_calibration: bool = False) -> dict:
     groups = rubric["evaluator_groups"]
     persona_groups: dict = {}
     for g in groups:
@@ -302,7 +302,7 @@ def aggregate(rubric: dict, raw_results: list, *, previous: dict | None = None,
         "deviation_alerts": [i["id"] for i in items_out if i["spread"] >= DEVIATION_THRESHOLD],
         "instability_alerts": [i["id"] for i in items_out if i["run_range"] >= INSTABILITY_THRESHOLD],
         "quotes_verified": source_norm is not None,
-        "calibration": calibration,
+        "calibration": is_calibration,
         "consensus_gaps": consensus,
         "fix_priority": fix_priority,
         "losses": losses,
@@ -394,7 +394,7 @@ def main(argv=None) -> int:
         result = aggregate(rubric, raws, previous=_find_previous(contest_dir, run_dir),
                            created_at=datetime.now().isoformat(timespec="minutes"),
                            target=args.target, run=run_dir.name, load_failures=load_failures,
-                           source_text=_read_target(run_dir), calibration=args.calibration)
+                           source_text=_read_target(run_dir), is_calibration=args.calibration)
     except AggregateError as e:
         raise InputError(str(e))
     result["evidence"] = evidence.summary(ledger, rubric) if ledger else None

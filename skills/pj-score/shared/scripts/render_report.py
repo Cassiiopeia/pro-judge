@@ -34,7 +34,7 @@ def contest_labels(run_dir) -> dict:
         rubric = load_yaml(contest / "rubric.yaml")
         labels["items"] = {it["id"]: it["name"] for it in rubric.get("items") or [] if it.get("id") and it.get("name")}
     except (InputError, AttributeError, TypeError):
-        pass
+        pass  # 표시 이름만 못 얻음 — 항목 id로 보고서 계속 생성 (점수표 검사는 aggregate 담당)
     for f in sorted((contest / "personas").glob("*.md")) if (contest / "personas").is_dir() else []:
         try:
             title = next((ln[2:].strip() for ln in f.read_text(encoding="utf-8").splitlines() if ln.startswith("# ")), "")
@@ -50,11 +50,11 @@ def _when(created_at: str) -> str:
     return str(created_at or "-").replace("T", " ")
 
 
-def _who(labels: dict, persona: str) -> str:
+def _persona_label(labels: dict, persona: str) -> str:
     return (labels or {}).get("personas", {}).get(persona) or persona
 
 
-def _item(labels: dict, iid: str) -> str:
+def _item_label(labels: dict, iid: str) -> str:
     return (labels or {}).get("items", {}).get(iid) or iid
 
 
@@ -144,12 +144,12 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
     b += [{"type": "fold", "label": "항목별 근거", "blocks": [
           {"type": "table", "headers": ["항목", "득점 / 배점", "심사위원별", "상한", "인용", "변화"],
            "rows": [[i["name"], f"{i['earned']:g} / {i['points_total']:g}",
-                     ", ".join(f"{_who(labels, p)} {s:g}" for p, s in i["by_persona"].items()),
+                     ", ".join(f"{_persona_label(labels, p)} {s:g}" for p, s in i["by_persona"].items()),
                      ", ".join(i["caps"]) or "-", " / ".join(i["quotes"]) or "(인용 없음)", _fmt_delta(i["delta"])]
                     for i in r["items"]]}]}]
 
     b += [{"type": "h2", "text": "심사위원별 총평"},
-          {"type": "cards", "items": [{"title": _who(labels, p["name"]),
+          {"type": "cards", "items": [{"title": _persona_label(labels, p["name"]),
                                        "sub": f"모델 {p['model'] or '미기록'}",
                                        "text": (nar.get("personas") or {}).get(p["name"]) or p["summary"] or "-"}
                                       for p in r["personas"]]}]
@@ -158,7 +158,7 @@ def _score_blocks(r: dict, labels: dict | None = None) -> list:
           {"type": "p", "text": "추정(inferred) 규칙 — 공고에 없어 에이전트가 정한 것"},
           {"type": "list", "items": r["inferred_rules"]},
           {"type": "p", "text": "실행 정보"},
-          {"type": "list", "items": [f"{_who(labels, p['name'])}: 모델 {p['model'] or '-'}, 독립 실행 {'예' if p['independent'] else '아니오'}"
+          {"type": "list", "items": [f"{_persona_label(labels, p['name'])}: 모델 {p['model'] or '-'}, 독립 실행 {'예' if p['independent'] else '아니오'}"
                                      for p in r["personas"]]
                                     + [f"제외 {n}: {'; '.join(e[:3])}" for n, e in r["failed"].items()]},
           {"type": "p", "text": "경고"},
@@ -258,7 +258,7 @@ def _qna_blocks(r: dict, labels: dict | None = None) -> list:
                                    + ([f"기준 회차 {r['based_on']}"] if r.get("based_on") else [])}]
     items, weak = [], []
     for n, q in enumerate(r["questions"], 1):
-        who, item = _who(labels, q["persona"]), _item(labels, q["item"])
+        who, item = _persona_label(labels, q["persona"]), _item_label(labels, q["item"])
         items.append({"no": n, "who": who, "item": item, "question": q["question"], "answer": q.get("answer"),
                       "verdict_label": VERDICT_LABEL[q.get("verdict")] if q.get("verdict") else None,
                       "reason": q.get("reason"), "model_answer": q.get("model_answer")})
@@ -281,7 +281,7 @@ def _qna_blocks(r: dict, labels: dict | None = None) -> list:
               {"type": "qa", "mode": "sheet", "items": items}]
     b += [{"type": "h2", "text": "자료 수정 제안"},
           {"type": "table", "headers": ["넣을 근거", "항목", "점수 변화"],
-           "rows": [[s["evidence"], _item(labels, s["item"]), f"{s['from_score']} → {s['to_score']} (10점 척도)"] for s in r.get("suggestions") or []]},
+           "rows": [[s["evidence"], _item_label(labels, s["item"]), f"{s['from_score']} → {s['to_score']} (10점 척도)"] for s in r.get("suggestions") or []]},
           {"type": "h2", "text": "총평"},
           {"type": "p", "text": _narrative(r).get("overall") or "(총평 없음)"}]
     return b

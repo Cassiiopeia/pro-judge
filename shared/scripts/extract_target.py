@@ -50,11 +50,11 @@ def parse_pages(spec, total: int) -> list:
     return pages
 
 
-def needs_ocr(text: str) -> bool:
+def is_ocr_needed(text: str) -> bool:
     return len(re.sub(r"\s", "", text or "")) < TEXT_MIN_CHARS
 
 
-# ---------- PDF 백엔드 ----------
+# PDF 백엔드 (PyMuPDF > poppler > pypdf)
 
 class PyMuPDFBackend:
     name = "pymupdf"
@@ -166,7 +166,7 @@ def pick_pdf_backend():
     raise InputError("PDF를 읽을 도구가 없습니다: python3 -m pip install pymupdf (Windows·macOS·Linux 공통)")
 
 
-# ---------- OCR 엔진: 이미지 목록 → {이미지: 글자} ----------
+# OCR 엔진: 이미지 목록 > {이미지: 글자}
 
 VISION_SRC = Path(__file__).resolve().parent / "ocr_vision.swift"
 
@@ -274,7 +274,7 @@ def pick_ocr(choice: str = "auto"):
     return None
 
 
-# ---------- 형식별 추출 ----------
+# 형식별 추출 (PDF, 이미지, 텍스트)
 
 def extract_pdf(path: Path, pages_spec, backend, ocr, img_dir: Path):
     """쪽마다 글자를 뽑고, 글자가 거의 없는 쪽은 OCR한다. OCR이 안 되면 쪽 이미지를 남긴다."""
@@ -287,7 +287,7 @@ def extract_pdf(path: Path, pages_spec, backend, ocr, img_dir: Path):
             text = backend.page_text(path, n)
         except Exception:
             text = ""  # 깨진 쪽 하나 때문에 나머지 쪽을 버리지 않는다
-        if not needs_ocr(text):
+        if not is_ocr_needed(text):
             chunks[n] = ("text", text)
             stats["text"] += 1
             continue

@@ -25,7 +25,7 @@ BANNED_ANCHOR_WORDS = ("잘했", "잘 했", "잘함", "충분", "적절", "우�
 ANCHOR_KEYS = ("0", "5", "10")
 
 
-def _is_num(v) -> bool:
+def _is_number(v) -> bool:
     return isinstance(v, (int, float)) and not isinstance(v, bool)
 
 
@@ -82,7 +82,7 @@ def _check_gate(gate: dict, errors: list) -> None:
         else:
             errors.append(f"{where}.min: 0~10 정수여야 함")
         mult = band.get("multiplier")
-        if not (_is_num(mult) and 0 < mult <= 1):
+        if not (_is_number(mult) and 0 < mult <= 1):
             errors.append(f"{where}.multiplier: 0 초과 1 이하여야 함")
     if 0 not in mins:
         errors.append("gate.bands: min 0 구간이 있어야 모든 점수가 구간에 들어감")
@@ -105,7 +105,7 @@ def _check_groups(groups: list, persona_dir: Path | None, errors: list) -> dict:
             errors.append(f"{where}: id 중복")
         _check_source(g, where, errors)
         w = g.get("weight")
-        if not (_is_num(w) and w > 0):
+        if not (_is_number(w) and w > 0):
             errors.append(f"{where}.weight: 양수여야 함")
             w = 0
         weights[gid] = w
@@ -141,7 +141,7 @@ def _check_item(item, idx: int, weights: dict, group_points: dict, errors: list)
     for gid, pt in points.items():
         if gid not in weights:
             errors.append(f"{where}.points: 없는 평가자 그룹 {gid!r}")
-        elif not (_is_num(pt) and pt >= 0):
+        elif not (_is_number(pt) and pt >= 0):
             errors.append(f"{where}.points.{gid}: 0 이상 숫자여야 함")
         else:
             group_points[gid] = group_points.get(gid, 0) + pt
